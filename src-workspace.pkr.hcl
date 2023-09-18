@@ -56,7 +56,7 @@ build {
   # Begin Docker specific provisioning
   provisioner "shell" {
     only   = ["docker.ubuntu-focal"]
-    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install python3 systemd sudo openssl -y"]
+    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install python3-minimal systemd sudo openssl -y"]
   }
 
   provisioner "ansible" {
@@ -93,7 +93,7 @@ build {
     extra_arguments = [
       "-b",
       "--extra-vars",
-      "{'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '/Users/dawa/Code/uu/src/deploy_components/dummy-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
+      "{'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '../dummy-external-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
       "-vvv"
     ]
   }
