@@ -1,0 +1,9 @@
+[submodule "plugin-external-plugin"]
+	path = plugin-external-plugin
+	url = https://gitlab.com/rsc-surf-nl/plugins/plugin-external-plugin.git
+[submodule "plugin-os"]
+	path = plugin-os
+	url = https://github.com/UtrechtUniversity/src-plugin-os.git
+[submodule "plugin-co"]
+	path = plugin-co
+	url = https://gitlab.com/rsc-surf-nl/plugins/plugin-co.git

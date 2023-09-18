@@ -65,7 +65,7 @@ build {
     extra_arguments = [
       "-b",
       "--skip-tags",
-      "nodocker",
+      "skip_on_container",
       "-vvv"
     ]
   }
