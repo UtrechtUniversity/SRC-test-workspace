@@ -1,7 +1,7 @@
-default_script_dir: /Users/dawa/Code/uu/src/components/researchcloud-items/playbooks
+default_script_dir: /path/to/researchcloud-items/playbooks
 enabled_components:
   - sssd:
-    base_dir: /Users/dawa/Code/uu/src/components/sssd_proxy
+    base_dir: /a/different/path/to/sssd_proxy
     path: sssd_proxy.yml
   # - docker:
   #   path: docker.yml
