@@ -48,6 +48,7 @@ packer {
 
 source "docker" "ubuntu" {
   image       = "ubuntu:focal"
+  #platform   = "linux/arm64"
   pull        = true
   commit      = true
   run_command = ["-d", "-i", "-t", "--name", var.ansible_host, "{{.Image}}", "/bin/bash"]
@@ -103,7 +104,7 @@ build {
   }
 
   provisioner "shell" {
-    inline = ["apt-get purge openssl -y && apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /root/.cache"]
+    inline = ["apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /root/.cache"]
   }
 
   post-processor "docker-tag" {
@@ -115,4 +116,3 @@ build {
     inline = ["docker system prune -f"]
   }
 }
-
