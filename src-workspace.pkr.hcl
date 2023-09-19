@@ -5,8 +5,18 @@ variable "ansible_host" {
 
 variable "enabled_sources" {
   default = [
-    "source.vagrant.ubuntu-focal",
-    "source.docker.ubuntu-focal"
+    "source.vagrant.ubuntu",
+    "source.docker.ubuntu"
+  ]
+  type = list(string)
+}
+
+variable "common_ansible_args" {
+  default = [
+    "-b",
+    "--scp-extra-args", # This is required because of a bug in Packer when using SSH>=9.0: https://github.com/hashicorp/packer-plugin-ansible/issues/100
+    "'-O'",
+    "-vvv"
   ]
   type = list(string)
 }
@@ -22,7 +32,7 @@ variable "testuser" {
 packer {
   required_plugins {
     docker = {
-      version = ">= 0.0.7"
+      version = "~> 1"
       source  = "github.com/hashicorp/docker"
     }
     ansible = {
@@ -36,14 +46,14 @@ packer {
   }
 }
 
-source "docker" "ubuntu-focal" {
+source "docker" "ubuntu" {
   image       = "ubuntu:focal"
-  pull        = "false"
+  pull        = true
   commit      = true
   run_command = ["-d", "-i", "-t", "--name", var.ansible_host, "{{.Image}}", "/bin/bash"]
 }
 
-source "vagrant" "ubuntu-focal" {
+source "vagrant" "ubuntu" {
   communicator = "ssh"
   source_path  = "ubuntu/focal64"
   provider     = "virtualbox"
@@ -55,32 +65,28 @@ build {
 
   # Begin Docker specific provisioning
   provisioner "shell" {
-    only   = ["docker.ubuntu-focal"]
+    only   = ["docker.ubuntu"]
     inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install python3-minimal systemd sudo openssl -y"]
   }
 
   provisioner "ansible" {
-    only          = ["docker.ubuntu-focal"]
+    only          = ["docker.ubuntu"]
     playbook_file = "./plugin-os/plugin-os.yml"
-    extra_arguments = [
-      "-b",
+    extra_arguments = concat(var.common_ansible_args, [
       "--skip-tags",
       "skip_on_container",
-      "-vvv"
-    ]
+    ])
   }
   # End Docker specific provisioning
 
   # Begin Vagrant specific provisioning
   provisioner "ansible" {
-    except        = ["docker.ubuntu-focal"]
+    except        = ["docker.ubuntu"]
     playbook_file = "./plugin-os/plugin-os.yml"
-    extra_arguments = [
-      "-b",
+    extra_arguments = concat(var.common_ansible_args, [
       "--extra-vars",
       "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${var.ansible_host}.test",
-      "-vvv"
-    ]
+    ])
   }
   # End Vagrant specific provisioning
 
@@ -90,12 +96,10 @@ build {
 
   provisioner "ansible" {
     playbook_file = "./plugin-external-plugin/plugin-external-plugin.yml"
-    extra_arguments = [
-      "-b",
+    extra_arguments = concat(var.common_ansible_args, [
       "--extra-vars",
       "{'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '../dummy-external-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
-      "-vvv"
-    ]
+    ])
   }
 
   provisioner "shell" {
@@ -103,7 +107,7 @@ build {
   }
 
   post-processor "docker-tag" {
-    only       = ["docker.ubuntu-focal"]
+    only       = ["docker.ubuntu"]
     repository = "src-basic-workspace"
   }
 }

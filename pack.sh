@@ -7,8 +7,8 @@ then
   exit 1
 fi
 
-DOCKER_SRC="\"sources.docker.ubuntu-focal\""
-VAGRANT_SRC="\"sources.vagrant.ubuntu-focal\""
+DOCKER_SRC="\"sources.docker.ubuntu\""
+VAGRANT_SRC="\"sources.vagrant.ubuntu\""
 TARGETS=()
 
 for i in "$@" ; do
