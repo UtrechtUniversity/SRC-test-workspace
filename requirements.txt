@@ -1,3 +1,2 @@
-pyaml
 docker==6.*
 PyYAML==6.*
