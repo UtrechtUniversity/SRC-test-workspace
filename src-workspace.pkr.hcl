@@ -107,8 +107,12 @@ build {
   }
 
   post-processor "docker-tag" {
-    only       = ["docker.ubuntu"]
+    except     = ["vagrant.ubuntu"]
     repository = "src-basic-workspace"
+  }
+  post-processor "shell-local" {
+    except = ["vagrant.ubuntu"]
+    inline = ["docker system prune -f"]
   }
 }
 
