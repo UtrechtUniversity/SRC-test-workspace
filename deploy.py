@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
 import yaml
+import tarfile
 import json
 import os
 import docker
 import shlex
+import traceback
+import tempfile
 from optparse import OptionParser
 
 parser = OptionParser()
@@ -19,6 +22,7 @@ if not options.config:
     raise Exception("You did not provide the required -c option.")
 
 method = options.method
+print("Using method '{}' for triggering ansible on the target.".format(method))
 
 with open(options.config) as cfg:
     workspace_config = yaml.safe_load(cfg)
@@ -28,6 +32,23 @@ default_dir = workspace_config['default_script_dir']
 DOCKER_IMG_NAME = 'src-basic-workspace'
 CONTAINER_NAME = 'src-test-container'
 EXTERNAL_COMPONENT = './plugin-external-plugin/plugin-external-plugin.yml'
+WORKSPACE_PLUGIN_DIR = '/rsc/plugins/'
+
+def container_copy_to(src, dst, container):
+    srcname = os.path.basename(src)
+    tmpdir = tempfile.TemporaryDirectory()
+    tarpath = os.path.join(tmpdir.name, srcname)
+
+    os.chdir(os.path.dirname(src))
+    tar = tarfile.open(tarpath, mode='w')
+    try:
+        tar.add(srcname)
+    finally:
+        tar.close()
+
+    data = open(tarpath, 'rb').read()
+    container.put_archive(os.path.dirname(dst), data)
+    tmpdir.cleanup()
 
 def execute_ansible(container, plugin):
     ansible_cmd = 'ansible-playbook -b -c docker -i "{container}," -vvv --extra-vars {parameters} {playbook}'
@@ -37,13 +58,18 @@ def execute_ansible(container, plugin):
     return os.system(cmd)
 
 def execute_docker(container, plugin):
-    cmd =  'ansible-playbook -vvv --connection=local -b {remote_plugin_arguments} --extra-vars="{remote_plugin_parameters}" /rsc/plugins/{remote_plugin_script_folder}/{remote_plugin_path}'.format(
-        remote_plugin_arguments = plugin.arguments,
-        remote_plugin_parameters = plugin.parameters,
-        remote_plugin_script_folder = os.path.basename(plugin.script_folder),
-        remote_plugin_path = plugin.path
+    print('Copying plugin to container...')
+    container_copy_to(plugin['script_folder'], WORKSPACE_PLUGIN_DIR, container)
+    cmd = 'ansible-playbook -vvv --connection=local -b {remote_plugin_arguments} --extra-vars="{remote_plugin_parameters}" {remote_plugin_script_folder}/{remote_plugin_path}'.format(
+        remote_plugin_arguments = plugin['arguments'],
+        remote_plugin_parameters = plugin['parameters'],
+        remote_plugin_script_folder = os.path.join(WORKSPACE_PLUGIN_DIR, os.path.basename(plugin['script_folder'])),
+        remote_plugin_path = plugin['path']
     )
-    return container.exec_run(cmd=cmd, priviliged=true)
+    (response, output) = container.exec_run(cmd=cmd, privileged=True, stream=True)
+    for data in output:
+        print(data.decode(), end='')
+    return response
 
 print('Starting up test image...')
 client = docker.from_env()
@@ -67,11 +93,12 @@ try:
         if method == 'ansible':
             result = execute_ansible(container, extra_vars)
         elif method == 'docker':
-            result = execute_docker(container, extra_vars)
+            result = execute_docker(container, extra_vars['remote_plugin'])
         else:
             raise Exception("Unknown method: {}".format(METHOD))
 
         if result is False:
             raise Exception("Failed to execute component!")
 except:
+    traceback.print_exc()
     container.stop()
