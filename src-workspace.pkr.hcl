@@ -47,7 +47,7 @@ packer {
 }
 
 source "docker" "ubuntu" {
-  image       = "ubuntu:focal"
+  image = "ubuntu:focal"
   #platform   = "linux/arm64"
   pull        = true
   commit      = true
@@ -92,7 +92,7 @@ build {
   # End Vagrant specific provisioning
 
   provisioner "shell" {
-    inline = ["useradd ${var.testuser.username}"]
+    inline = ["useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}"]
   }
 
   provisioner "ansible" {
