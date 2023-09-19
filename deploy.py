@@ -30,14 +30,14 @@ CONTAINER_NAME = 'src-test-container'
 EXTERNAL_COMPONENT = './plugin-external-plugin/plugin-external-plugin.yml'
 
 def execute_ansible(container, plugin):
-    ansible_cmd = 'ansible-playbook -b -u root -c docker -i "{container}," -vvvv --extra-vars {parameters} {playbook}'
+    ansible_cmd = 'ansible-playbook -b -c docker -i "{container}," -vvv --extra-vars {parameters} {playbook}'
     params = shlex.quote(json.dumps(plugin))
     cmd = ansible_cmd.format(container=container.name, playbook=EXTERNAL_COMPONENT, parameters=params)
     print("Running ", cmd)
     return os.system(cmd)
 
 def execute_docker(container, plugin):
-    cmd =  'ansible-playbook --connection=local -b {remote_plugin_arguments} --extra-vars="{remote_plugin_parameters}" /rsc/plugins/{remote_plugin_script_folder}/{remote_plugin_path}'.format(
+    cmd =  'ansible-playbook -vvv --connection=local -b {remote_plugin_arguments} --extra-vars="{remote_plugin_parameters}" /rsc/plugins/{remote_plugin_script_folder}/{remote_plugin_path}'.format(
         remote_plugin_arguments = plugin.arguments,
         remote_plugin_parameters = plugin.parameters,
         remote_plugin_script_folder = os.path.basename(plugin.script_folder),
@@ -53,6 +53,7 @@ print('Container started -- do not forget to stop it! Container name: {}'.format
 try:
     for component in workspace_config['components']:
         extra_vars = {
+            'remote_ansible_version': '2.9.22',
             'remote_plugin':
             {
                 'script_type': 'Ansible PlayBook',
@@ -64,9 +65,9 @@ try:
             }
         }
         if method == 'ansible':
-            result = execute_ansible(container, plugin)
+            result = execute_ansible(container, extra_vars)
         elif method == 'docker':
-            result = execute_docker(container, plugin)
+            result = execute_docker(container, extra_vars)
         else:
             raise Exception("Unknown method: {}".format(METHOD))
 
