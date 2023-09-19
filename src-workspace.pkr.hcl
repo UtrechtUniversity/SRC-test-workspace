@@ -91,7 +91,7 @@ build {
   # End Vagrant specific provisioning
 
   provisioner "shell" {
-    inline = ["useradd -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}"]
+    inline = ["useradd ${var.testuser.username}"]
   }
 
   provisioner "ansible" {
@@ -103,7 +103,7 @@ build {
   }
 
   provisioner "shell" {
-    inline = ["apt-get purge -y openssl && apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /root/.cache"]
+    inline = ["apt-get purge openssl -y && apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /root/.cache"]
   }
 
   post-processor "docker-tag" {
