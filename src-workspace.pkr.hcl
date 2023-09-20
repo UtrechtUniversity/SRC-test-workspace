@@ -26,6 +26,15 @@ variable "common_ansible_args" {
   type = list(string)
 }
 
+variable "base_apt_packages" {
+  # It is currently necessary to install jinja2 as an apt package to keep jinja at version ~=2.
+  # If we don't, jinja2 will be installed by pip as a dependency of ansible (in the external plugin)
+  # That will cause version 3.1 of jinja to be installed, and this is not compatible with ansible 2.9.
+  # Ansible 2.9.22 fixes this issue: https://github.com/ansible/ansible/issues/77413
+  default = "python3 python3-jinja2 systemd sudo openssl"
+  type    = string
+}
+
 variable "testuser" {
   type = map(string)
   default = {
@@ -69,12 +78,12 @@ source "vagrant" "ubuntu" {
 build {
   sources = var.enabled_sources
 
-  # Begin Docker specific provisioning
   provisioner "shell" {
     only   = ["docker.ubuntu"]
-    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install python3-minimal systemd sudo openssl -y"]
+    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install ${var.base_apt_packages} -y"]
   }
 
+  # Begin Docker specific provisioning
   provisioner "ansible" {
     only          = ["docker.ubuntu"]
     playbook_file = "./plugin-os/plugin-os.yml"
