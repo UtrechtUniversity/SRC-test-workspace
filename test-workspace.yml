@@ -1,7 +1,0 @@
-default_script_dir: /path/to/playbooks/
-components:
-  - my_playbook:
-    path: my_playbook.yml # Uses the default_script_dir as a base directory
-  - my_playbook2:
-    base_dir: /a/different/path/to/a/playbook
-    path: my_playbook.yml
