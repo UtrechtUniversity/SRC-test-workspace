@@ -59,7 +59,9 @@ This component is an Ansible playbook that:
 * calls the locally installed `ansible-playbook` to execute third-party (e.g. our) components
 
 The Packer template will execute the SRC-External component once, with the `dummy-external-plugin` component. The latter does not do anything except a ping operation, but running the 
-SRC-External playbook on the workspace ensures that Ansible is installed in exactly the same way and using exactly the same version as on Research Cloud. 
+SRC-External playbook on the workspace ensures that Ansible is installed in exactly the same way and using exactly the same version as on Research Cloud.
+
+Ensuring that Ansible and dependencies are already installed on the workspace means that executing further Ansible scripts on the workspace goes much faster than otherwise.
 
 # Limitations
 
