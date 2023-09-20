@@ -32,6 +32,7 @@ default_dir = workspace_config['default_script_dir']
 DOCKER_IMG_NAME = 'src-basic-workspace'
 CONTAINER_NAME = 'src-test-container'
 EXTERNAL_COMPONENT = './plugin-external-plugin/plugin-external-plugin.yml'
+WORKSPACE_ANSIBLE_VERSION = workspace_config.get('remote_ansible_version', None)
 WORKSPACE_PLUGIN_DIR = '/rsc/plugins/'
 
 def container_copy_to(src, dst, container):
@@ -60,11 +61,11 @@ def execute_ansible(container, plugin):
 def execute_docker(container, plugin):
     print('Copying plugin to container...')
     container_copy_to(plugin['script_folder'], WORKSPACE_PLUGIN_DIR, container)
-    cmd = 'ansible-playbook -vvv --connection=local -b {remote_plugin_arguments} --extra-vars="{remote_plugin_parameters}" {remote_plugin_script_folder}/{remote_plugin_path}'.format(
-        remote_plugin_arguments = plugin['arguments'],
-        remote_plugin_parameters = plugin['parameters'],
-        remote_plugin_script_folder = os.path.join(WORKSPACE_PLUGIN_DIR, os.path.basename(plugin['script_folder'])),
-        remote_plugin_path = plugin['path']
+    cmd = 'ansible-playbook -vvv --connection=local -b {plugin_arguments} --extra-vars="{plugin_parameters}" {plugin_script_folder}/{plugin_path}'.format(
+        plugin_arguments = plugin['arguments'],
+        plugin_parameters = plugin['parameters'],
+        plugin_script_folder = os.path.join(WORKSPACE_PLUGIN_DIR, os.path.basename(plugin['script_folder'])),
+        plugin_path = plugin['path']
     )
     (response, output) = container.exec_run(cmd=cmd, privileged=True, stream=True)
     for data in output:
@@ -79,7 +80,6 @@ print('Container started -- do not forget to stop it! Container name: {}'.format
 try:
     for component in workspace_config['components']:
         extra_vars = {
-            'remote_ansible_version': '2.9.22',
             'remote_plugin':
             {
                 'script_type': 'Ansible PlayBook',
@@ -90,6 +90,9 @@ try:
                 'arguments': '-i 127.0.0.1,'
             }
         }
+        if WORKSPACE_ANSIBLE_VERSION:
+            extra_vars['remote_ansible_plugin'] = WORKSPACE_ANSIBLE_VERSION
+
         if method == 'ansible':
             result = execute_ansible(container, extra_vars)
         elif method == 'docker':

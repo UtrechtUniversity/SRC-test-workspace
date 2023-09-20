@@ -11,12 +11,17 @@ variable "enabled_sources" {
   type = list(string)
 }
 
+variable "workspace_ansible_version" {
+  default = "2.9"
+  type    = string
+}
+
 variable "common_ansible_args" {
   default = [
     "-b",
     "--scp-extra-args", # This is required because of a bug in Packer when using SSH>=9.0: https://github.com/hashicorp/packer-plugin-ansible/issues/100
     "'-O'",
-    "-vvv"
+    "-vvvv"
   ]
   type = list(string)
 }
@@ -99,7 +104,7 @@ build {
     playbook_file = "./plugin-external-plugin/plugin-external-plugin.yml"
     extra_arguments = concat(var.common_ansible_args, [
       "--extra-vars",
-      "{'remote_ansible_version': '2.9.22', 'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '../dummy-external-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
+      "{'remote_ansible_version': '${var.workspace_ansible_version}', 'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '../dummy-external-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
     ])
   }
 
