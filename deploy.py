@@ -10,12 +10,19 @@ import traceback
 import tempfile
 from optparse import OptionParser
 
+DOCKER_IMG_NAME = 'src-basic-workspace'
+CONTAINER_NAME = 'src-test-container'
+EXTERNAL_COMPONENT = './plugin-external-plugin/plugin-external-plugin.yml'
+WORKSPACE_PLUGIN_DIR = '/rsc/plugins/'
+
+### User supplied configuration ###
 parser = OptionParser()
 parser.add_option("-m", "--method", choices=("ansible", "docker"),
                   help="Which method to use to execute ansible on the target (ansible into the target, or use docker exec).",
                   default="ansible")
 parser.add_option("-c", "--config",
                   help="Path to .yml file describing the components and parameters to be deployed.")
+parser.add_option("-s", "--stop", help="See if an old container with the configured name ('{}') exists and stop it if so.".format(CONTAINER_NAME))
 (options, args) = parser.parse_args()
 
 if not options.config:
@@ -29,11 +36,21 @@ with open(options.config) as cfg:
 
 default_dir = workspace_config['default_script_dir']
 
-DOCKER_IMG_NAME = 'src-basic-workspace'
-CONTAINER_NAME = 'src-test-container'
-EXTERNAL_COMPONENT = './plugin-external-plugin/plugin-external-plugin.yml'
 WORKSPACE_ANSIBLE_VERSION = workspace_config.get('remote_ansible_version', None)
-WORKSPACE_PLUGIN_DIR = '/rsc/plugins/'
+### End user-supplied configuration ###
+
+### Stop/run docker container
+print('Starting up test image...')
+client = docker.from_env()
+if options.stop:
+    try:
+        old_container = client.containers.get(CONTAINER_NAME)
+        old_container.stop()
+    except:
+        pass
+container = client.containers.run(DOCKER_IMG_NAME, detach=True, command="/bin/bash", tty=True, init=True, name=CONTAINER_NAME, auto_remove=True)
+print('Container started -- do not forget to stop it! Container name: {}'.format(container.name))
+###
 
 def container_copy_to(src, dst, container):
     srcname = os.path.basename(src)
@@ -71,11 +88,6 @@ def execute_docker(container, plugin):
     for data in output:
         print(data.decode(), end='')
     return response
-
-print('Starting up test image...')
-client = docker.from_env()
-container = client.containers.run(DOCKER_IMG_NAME, detach=True, command="/bin/bash", tty=True, init=True, name=CONTAINER_NAME, auto_remove=True)
-print('Container started -- do not forget to stop it! Container name: {}'.format(container.name))
 
 try:
     for component in workspace_config['components']:
