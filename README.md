@@ -74,7 +74,7 @@ Packer will use the most recent version of the source OS images available on Doc
 
 ### No modifications of /etc/hosts and /etc/hostname possible on Docker
 
-Docker does not allow modifying `/etc/hosts` or `/etc/hostname`. The SRC-OS component tries to do just that. To work around this issue, this repository utilizes a [fork]() of the 
+Docker does not allow modifying `/etc/hosts` or `/etc/hostname`. The SRC-OS component tries to do just that. To work around this issue, this repository utilizes a [fork](https://github.com/UtrechtUniversity/src-plugin-os/tree/3afd56eb7f4e5ad53d2e91b35920205384cbe6f6) of the 
 component that adds tags to the tasks that attempt to modify the `/etc/host*` files. Tasks with these tags are skipped by ansible (as defined in the Packer template).
 
 ### No SRC-component
