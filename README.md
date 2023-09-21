@@ -65,8 +65,12 @@ Ensuring that Ansible and dependencies are already installed on the workspace me
 
 # Limitations
 
-This Packer template does not generate containers or images that are *identical* to SRC workspaces, for a few reasons explained below. The goal is to generate workspaces that are close 
-enough for local testing purposes.
+This Packer template does not generate containers or images that are *identical* to SRC workspaces, for a few reasons explained below. This is in principle not a problem, because the goal is to generate workspace images that are:
+
+1. close enough for local testing purposes
+1. contain as *minimal* a set of preinstalled packages as possible.
+
+This will help e.g. to identify hidden assumptions in our workspace definitions. For instance, some playbooks may succeed because they implicitly rely on the presence of packages present on some of SURF's OS images. As long as these dependencies remain implicit, the playbooks may fail when executed on different (newer) OS images.
 
 ### Not the same base image
 
