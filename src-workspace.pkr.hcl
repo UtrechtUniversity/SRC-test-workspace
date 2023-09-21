@@ -43,6 +43,11 @@ variable "testuser" {
   }
 }
 
+variable "target_arch" {
+  default = "linux/amd64"
+  type    = string
+}
+
 packer {
   required_plugins {
     docker = {
@@ -61,8 +66,8 @@ packer {
 }
 
 source "docker" "ubuntu" {
-  image = "ubuntu:focal"
-  #platform   = "linux/arm64"
+  image       = "ubuntu:focal"
+  platform    = var.target_arch
   pull        = true
   commit      = true
   run_command = ["-d", "-i", "-t", "--name", var.ansible_host, "{{.Image}}", "/bin/bash"]
