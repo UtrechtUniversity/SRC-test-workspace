@@ -1,6 +1,8 @@
 # SRC-test-workspace
 
-A [Packer](https://www.packer.io/) image definition for building images and containers that mimic a SURF Research Cloud (SRC) workspace. Provided are:
+A set of scripts and [Packer](https://www.packer.io/) image definitions for building images and containers that mimic a SURF Research Cloud (SRC) workspace.
+
+Provided are:
 
 * `ubuntu20/src-workspace.pkr.hcl`: the Packer template for an Ubuntu 20.04 workspace
 * `pack.sh`: a script that wraps Packer to generate a container or virtual machine image.
