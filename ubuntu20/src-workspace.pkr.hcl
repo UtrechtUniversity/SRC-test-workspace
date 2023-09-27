@@ -118,7 +118,7 @@ build {
     playbook_file = "./plugin-external-plugin/plugin-external-plugin.yml"
     extra_arguments = concat(var.common_ansible_args, [
       "--extra-vars",
-      "{'remote_ansible_version': '${var.workspace_ansible_version}', 'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '../dummy-external-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
+      "{'remote_ansible_version': '${var.workspace_ansible_version}', 'remote_plugin': {'script_type': 'Ansible PlayBook', 'script_folder': '../dummy-plugin', 'path': 'dummy.yml', 'parameters': {}, 'arguments': '-i 127.0.0.1,'}}",
     ])
   }
 

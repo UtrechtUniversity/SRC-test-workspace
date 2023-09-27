@@ -1,5 +1,5 @@
 #!/bin/bash
-
+IMG="ubuntu20"
 VALID_SOURCES="docker, vagrant"
 if [ "$#" -lt 1 ]
 then
@@ -30,6 +30,6 @@ else
   printf -v joined_targets '%s,' "${TARGETS[@]}"
 fi
 
-CMD="packer fmt . && packer build -var 'enabled_sources=[$joined_targets]' ."
+CMD="packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' $IMG"
 echo "Running: $CMD"
 eval "$CMD";
