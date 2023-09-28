@@ -123,7 +123,7 @@ build {
   }
 
   provisioner "shell" {
-    inline = ["apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /root/.cache"]
+    inline = ["apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*"]
   }
 
   post-processor "docker-tag" {
