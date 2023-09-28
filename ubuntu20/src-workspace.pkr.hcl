@@ -85,7 +85,7 @@ build {
 
   provisioner "shell" {
     only   = ["docker.ubuntu"]
-    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install ${var.base_apt_packages} -y"]
+    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_apt_packages}"]
   }
 
   # Begin Docker specific provisioning
@@ -122,8 +122,10 @@ build {
     ])
   }
 
+  # The autoremove command run below removes recommended and suggested packages installed by 'apt installs' executed by the components executed above.
+  # This makes for a smaller image (~260MB), but it may result in errors if further components implicitly rely on those recommended packages.
   provisioner "shell" {
-    inline = ["apt-get autoremove -y && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*"]
+    inline = ["apt-get autoremove -y -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*"]
   }
 
   post-processor "docker-tag" {
