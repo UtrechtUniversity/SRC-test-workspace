@@ -31,6 +31,12 @@ REPOSITORY            TAG       IMAGE ID       CREATED         SIZE
 src-basic-workspace   latest    c4c4496e23b5   6 minutes ago   608MB
 ```
 
+### Architecture
+
+By default, images will be built for the `amd64` architecture. Set the `ARCH` environment variable to change this to `arm64`. For example:
+
+`ARCH=arm64 ./pack.sh docker`
+
 # How it works
 
 The template uses a basic OS container (for the Docker target) or VM image (for the Vagrant target) to build the workspace on top of. At present, only Ubuntu 20.04 (focal) sources are 
