@@ -1,11 +1,15 @@
 #!/bin/bash
-IMG="ubuntu20"
 VALID_SOURCES="docker, vagrant"
 
 if [ "$#" -lt 1 ]
 then
   echo "No valid build targets supplied. Pass at least one of: $VALID_SOURCES."
   exit 1
+fi
+
+if [ -z $IMG ]
+then
+  IMG="ubuntu/focal"
 fi
 
 if [ -z $ARCH ]
@@ -39,6 +43,6 @@ else
   printf -v joined_targets '%s,' "${TARGETS[@]}"
 fi
 
-CMD="packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG"
+CMD="packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' -var 'img_name=$IMG' $IMG"
 echo "Running: $CMD"
 eval "$CMD";

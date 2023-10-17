@@ -48,6 +48,15 @@ variable "target_arch" {
   type    = string
 }
 
+variable "img_name" {
+  default = "workspace"
+  type    = string
+}
+
+locals {
+  img_name = join("-", ["src", replace(var.img_name, "/", "_")])
+}
+
 packer {
   required_plugins {
     docker = {
@@ -130,7 +139,7 @@ build {
 
   post-processor "docker-tag" {
     except     = ["vagrant.ubuntu"]
-    repository = "src-basic-workspace"
+    repository = local.img_name
   }
   post-processor "shell-local" {
     except = ["vagrant.ubuntu"]
