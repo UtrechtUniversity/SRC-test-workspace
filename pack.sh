@@ -43,6 +43,6 @@ else
   printf -v joined_targets '%s,' "${TARGETS[@]}"
 fi
 
-CMD="packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' -var 'img_name=$IMG' $IMG"
+CMD="packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG"
 echo "Running: $CMD"
 eval "$CMD";

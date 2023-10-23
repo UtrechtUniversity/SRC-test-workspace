@@ -1,0 +1,5 @@
+img_name                  = "src-ubuntu_focal"
+docker_base_img           = "ubuntu:focal"
+vagrant_base_img          = "ubuntu/focal64"
+extra_packages            = ""
+workspace_ansible_version = "2.9"

@@ -26,12 +26,17 @@ variable "common_ansible_args" {
   type = list(string)
 }
 
-variable "base_apt_packages" {
+variable "base_packages" {
   # It is currently necessary to install jinja2 as an apt package to keep jinja at version ~=2.
   # If we don't, jinja2 will be installed by pip as a dependency of ansible (in the external plugin)
   # That will cause version 3.1 of jinja to be installed, and this is not compatible with ansible 2.9.
   # Ansible 2.9.22 fixes this issue: https://github.com/ansible/ansible/issues/77413
   default = "python3 python3-jinja2 systemd sudo openssl git gpg gpg-agent"
+  type    = string
+}
+
+variable "extra_packages" {
+  default = ""
   type    = string
 }
 
@@ -48,13 +53,19 @@ variable "target_arch" {
   type    = string
 }
 
-variable "img_name" {
-  default = "workspace"
+variable "docker_base_img" {
+  default = ""
   type    = string
 }
 
-locals {
-  img_name = join("-", ["src", replace(var.img_name, "/", "_")])
+variable "vagrant_base_img" {
+  default = ""
+  type    = string
+}
+
+variable "img_name" {
+  default = "src-workspace"
+  type    = string
 }
 
 packer {
@@ -75,7 +86,7 @@ packer {
 }
 
 source "docker" "ubuntu" {
-  image       = "ubuntu:focal"
+  image       = var.docker_base_img
   platform    = var.target_arch
   pull        = true
   commit      = true
@@ -84,7 +95,7 @@ source "docker" "ubuntu" {
 
 source "vagrant" "ubuntu" {
   communicator = "ssh"
-  source_path  = "ubuntu/focal64"
+  source_path  = var.vagrant_base_img
   provider     = "virtualbox"
   add_force    = true
 }
@@ -94,7 +105,7 @@ build {
 
   provisioner "shell" {
     only   = ["docker.ubuntu"]
-    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_apt_packages}"]
+    inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"]
   }
 
   # Begin Docker specific provisioning
@@ -139,7 +150,7 @@ build {
 
   post-processor "docker-tag" {
     except     = ["vagrant.ubuntu"]
-    repository = local.img_name
+    repository = var.img_name
   }
   post-processor "shell-local" {
     except = ["vagrant.ubuntu"]
