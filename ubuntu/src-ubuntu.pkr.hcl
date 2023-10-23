@@ -26,12 +26,28 @@ variable "common_ansible_args" {
   type = list(string)
 }
 
+variable "co_plugin_args" {
+  type = map(string)
+  default = {
+    "co_totp"              = false,
+    "co_researchdrive"     = false,
+    "co_irods"             = false,
+    "owner_id"             = "mocked_id",
+    "co_user_api_endpoint" = "127.0.0.1",
+    "co_token"             = "mocked_token",
+    "co_id"                = "testimage",
+    "co_passwordless_sudo" = true,
+    "workspace_id"         = "mocked",
+    "workspace_name"       = "src-test-workspace"
+  }
+}
+
 variable "base_packages" {
   # It is currently necessary to install jinja2 as an apt package to keep jinja at version ~=2.
   # If we don't, jinja2 will be installed by pip as a dependency of ansible (in the external plugin)
   # That will cause version 3.1 of jinja to be installed, and this is not compatible with ansible 2.9.
   # Ansible 2.9.22 fixes this issue: https://github.com/ansible/ansible/issues/77413
-  default = "python3 python3-jinja2 systemd sudo openssl git gpg gpg-agent"
+  default = "python3 python3-jinja2 systemd sudo openssl git gpg gpg-agent cron"
   type    = string
 }
 
@@ -132,6 +148,14 @@ build {
 
   provisioner "shell" {
     inline = ["useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}"]
+  }
+
+  provisioner "ansible" {
+    playbook_file = "./plugin-co/plugin-co.yml"
+    extra_arguments = concat(var.common_ansible_args, [
+      "--extra-vars",
+      jsonencode(var.co_plugin_args),
+    ])
   }
 
   provisioner "ansible" {
