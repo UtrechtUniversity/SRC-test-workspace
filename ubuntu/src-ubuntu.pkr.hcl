@@ -1,5 +1,5 @@
 variable "ansible_host" {
-  default = "packer-src-workspace"
+  default = "packer-src"
   type    = string
 }
 
@@ -84,6 +84,10 @@ variable "img_name" {
   type    = string
 }
 
+local "ansible_host" {
+  expression = "${var.ansible_host}-${var.img_name}"
+}
+
 local "dummy_plugin_args" {
   expression = {
     "remote_ansible_version" = "${var.workspace_ansible_version}",
@@ -119,7 +123,7 @@ source "docker" "ubuntu" {
   platform    = var.target_arch
   pull        = true
   commit      = true
-  run_command = ["-d", "-i", "-t", "--name", var.ansible_host, "{{.Image}}", "/bin/bash"]
+  run_command = ["-d", "-i", "-t", "--name", local.ansible_host, "{{.Image}}", "/bin/bash"]
 }
 
 source "vagrant" "ubuntu" {
@@ -154,7 +158,7 @@ build {
     playbook_file = "./plugin-os/plugin-os.yml"
     extra_arguments = concat(var.common_ansible_args, [
       "--extra-vars",
-      "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${var.ansible_host}.test",
+      "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${local.ansible_host}.test",
     ])
   }
   # End Vagrant specific provisioning
