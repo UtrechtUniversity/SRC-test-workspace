@@ -7,12 +7,12 @@ then
   exit 1
 fi
 
-if [ -z $IMG ]
+if [ -z "$IMG" ]
 then
   IMG="ubuntu/focal"
 fi
 
-if [ -z $ARCH ]
+if [ -z "$ARCH" ]
 then
   ARCH="linux/amd64"
 else
@@ -26,10 +26,10 @@ TARGETS=()
 
 for i in "$@" ; do
     if [[ $i == "docker" ]] ; then
-        TARGETS+=($DOCKER_SRC)
+        TARGETS+=("$DOCKER_SRC")
     fi
     if [[ $i == "vagrant" ]] ; then
-        TARGETS+=($VAGRANT_SRC)
+        TARGETS+=("$VAGRANT_SRC")
     fi
 done
 

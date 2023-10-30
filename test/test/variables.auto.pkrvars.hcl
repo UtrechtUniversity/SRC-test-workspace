@@ -1,1 +1,0 @@
-img_name                  = "src-ubuntu_focal"
