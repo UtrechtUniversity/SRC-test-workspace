@@ -1,3 +1,8 @@
+variable "source_repo" {
+  default = "https://github.com/utrechtuniversity/src-test-workspace"
+  type    = string
+}
+
 variable "ansible_host" {
   default = "packer-src"
   type    = string
@@ -124,6 +129,9 @@ source "docker" "ubuntu" {
   pull        = true
   commit      = true
   run_command = ["-d", "-i", "-t", "--name", local.ansible_host, "{{.Image}}", "/bin/bash"]
+  changes = [
+    "LABEL org.opencontainers.image.source=${var.source_repo}"
+  ]
 }
 
 source "vagrant" "ubuntu" {
