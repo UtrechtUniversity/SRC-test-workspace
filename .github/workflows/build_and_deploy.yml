@@ -1,0 +1,54 @@
+---
+name: Molecule
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  define_images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "${{ github.repository }}"
+      - name: Get changed image definitions
+        id: changed-images-yaml
+        uses: tj-actions/changed-files@v39
+        with:
+          json: true
+          dir_names: true
+          dir_names_max_depth: 2
+          quotepath: false
+          files_yaml: |
+            images:
+              - '*/*/*.hcl'
+      - id: set-images-matrix
+        run: echo "matrix=${{ steps.changed-images-yaml.outputs.images_all_changed_files }}" >> $GITHUB_OUTPUT
+      - name: Debug
+        run: echo ${{ steps.set-images-matrix.outputs.matrix }}
+    outputs:
+      images_matrix: ${{ steps.set-images-matrix.outputs.matrix }}
+
+  build_and_deploy:
+    needs: define_images
+    runs-on: ubuntu-latest
+    if: ${{ needs.define_images.outputs.images_matrix != '[]' && needs.define_scenarios.outputs.images_matrix != '' }}
+    env:
+      DOCKER_USER: ${{ github.actor }}
+      DOCKER_PW: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_REGISTRY: ghcr.io
+    strategy:
+      fail-fast: false
+      matrix:
+        images: ${{ fromJSON(needs.define_images.outputs.images_matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build image
+        run: IMG=${{ matrix.images }} ./pack.sh docker
