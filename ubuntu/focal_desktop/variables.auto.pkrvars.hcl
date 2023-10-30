@@ -1,4 +1,6 @@
-img_name                  = "src-ubuntu_focal_desktop"
+img_name                  = "src-test-workspace"
+docker_repo               = "ghcr.io/utrechtuniversity/src-test-workspace"
+img_tag                   = "ubuntu_focal-desktop"
 docker_base_img           = "ubuntu:focal"
 vagrant_base_img          = "ubuntu/focal64"
 extra_packages            = "xfce4"

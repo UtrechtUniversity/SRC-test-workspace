@@ -3,6 +3,11 @@ variable "source_repo" {
   type    = string
 }
 
+variable "docker_repo" {
+  default = ""
+  type    = string
+}
+
 variable "ansible_host" {
   default = "packer-src"
   type    = string
@@ -85,12 +90,17 @@ variable "vagrant_base_img" {
 }
 
 variable "img_name" {
-  default = "src-workspace"
+  default = ""
+  type    = string
+}
+
+variable "img_tag" {
+  default = ""
   type    = string
 }
 
 local "ansible_host" {
-  expression = "${var.ansible_host}-${var.img_name}"
+  expression = "${var.ansible_host}-${var.img_tag}"
 }
 
 local "dummy_plugin_args" {
@@ -199,7 +209,7 @@ build {
 
   post-processor "docker-tag" {
     except     = ["vagrant.ubuntu"]
-    repository = var.img_name
+    repository = "${var.docker_repo}:${var.img_tag}"
   }
   post-processor "shell-local" {
     except = ["vagrant.ubuntu"]
