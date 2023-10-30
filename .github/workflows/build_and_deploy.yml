@@ -11,6 +11,10 @@ on:
 jobs:
 
   define_images:
+    # Define a matrix based on all changed *.hcl files so we can run packer only for image definitions that have actually changed
+    # So if e.g. ubuntu/focal/variables.auto.pkrvars.hcl or ubuntu/focal/src-ubuntu.pkr.hcl changes, add "ubuntu/focal" to the matrix
+    # Also ensure that if an image template (for instance, the general template for ubuntu images 'ubuntu/src-ubuntu.pkr.hcl') changes,
+    # an entry is added to the matrix for each image definition that relies on (i.e. symlinks) it.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,20 +22,47 @@ jobs:
         with:
           path: "${{ github.repository }}"
       - name: Get changed image definitions
+        # Find changed .hcl files in all <os>/<version> directories
         id: changed-images-yaml
         uses: tj-actions/changed-files@v39
         with:
-          json: true
           dir_names: true
           dir_names_max_depth: 3
           quotepath: false
           files_yaml: |
             images:
               - '*/*/*.hcl'
+      - name: Get changed templates (symlinks)
+        # Find all templates (symlinks) in all <os>/ directories
+        id: changed-symlink-yaml
+        uses: tj-actions/changed-files@v39
+        with:
+          quotepath: false
+          files_yaml: |
+            symlinks:
+              - '*/*.hcl'
+      - name: Get image directories based on changed templates
+        # For every changed templates in an <os> directory, collect all <os>/<version> directories that contain a symlink to the template.
+        # For instance, if ubuntu/src-ubunut.pkr.hcl changes, find all subdirectories of 'ubuntu' that contain links to that file
+        # -> the result would be e.g. 'ubuntu/focal ubuntu/jammy ubuntu/focal_desktop'
+        id: get-symlink-dirs
+        working-directory: "${{ github.repository }}"
+        run: |
+          for file in ${{ steps.changed-symlink-yaml.outputs.symlinks_all_changed_files }}; do
+              dir=$(dirname $file)
+              links=$(find "$dir" -type l)
+              for link in $links; do
+                if [[ $(readlink -f "$link") == $(realpath "$file") ]]; then
+                  CHANGED="$CHANGED $(dirname $link)"
+                fi
+              done
+          done
+          echo changed_dirs="$CHANGED" >> "$GITHUB_OUTPUT"
       - id: set-images-matrix
-        run: echo "matrix=${{ steps.changed-images-yaml.outputs.images_all_changed_files }}" >> $GITHUB_OUTPUT
-      - name: Debug
-        run: echo ${{ steps.set-images-matrix.outputs.matrix }}
+        run: | # Add together the directories found in the changed-images-yaml and get-symlink-dirs steps into a single matrix
+          MATRIX=(${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }} )
+          MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)
+          echo matrix={\"images\": $MATRIX} >> $GITHUB_OUTPUT
     outputs:
       images_matrix: ${{ steps.set-images-matrix.outputs.matrix }}
 
@@ -39,16 +70,27 @@ jobs:
     needs: define_images
     runs-on: ubuntu-latest
     if: ${{ needs.define_images.outputs.images_matrix != '[]' && needs.define_images.outputs.images_matrix != '' }}
-    env:
-      DOCKER_USER: ${{ github.actor }}
-      DOCKER_PW: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_REGISTRY: ghcr.io
     strategy:
       fail-fast: false
-      matrix:
-        images: ${{ fromJSON(needs.define_images.outputs.images_matrix) }}
+      matrix: ${{ fromJSON(needs.define_images.outputs.images_matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
+        id: build-image
         run: IMG=${{ matrix.images }} ./pack.sh docker
+      - name: Get image name # grep in the image directory's variables file to find the image tag to push
+        id: get-image-name
+        run: echo "image_name=`grep img_name ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
+      - name: Debug
+        run: echo ${{ steps.get-image-name.outputs.image_name }}
+      - name: Push image
+        run: docker push ${{ steps.get-image-name.outputs.image_name }}:latest
