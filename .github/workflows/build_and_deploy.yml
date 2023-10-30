@@ -88,12 +88,11 @@ jobs:
       - name: Build image
         id: build-image
         run: IMG=${{ matrix.images }} ./pack.sh docker
-      - name: Get image name # grep in the image directory's variables file to find the image tag to push
+      - name: Get image name and tag # grep in the image directory's variables file to find the image name/tag to push to
         id: get-image-name
         run: |
-          echo "image_name=`grep img_name ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
-          echo "image_tag=`grep img_tag ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
+          echo "docker_repo=`grep docker_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
       - name: Debug
-        run: echo ${{ steps.get-image-name.outputs.image_name }} ${{ steps.get-image-name.outputs.image_tag }}
+        run: echo ${{ steps.get-image-name.outputs.image_name }}
       - name: Push image
-        run: docker push ${{ steps.get-image-name.outputs.image_name }}:${{ steps.get-image-name.outputs.image_tag }}
+        run: docker push ${{ steps.get-image-name.outputs.docker_repo }}

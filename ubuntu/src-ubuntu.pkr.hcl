@@ -90,7 +90,7 @@ variable "vagrant_base_img" {
 }
 
 variable "img_name" {
-  default = ""
+  default = "src-test-workspace"
   type    = string
 }
 
@@ -209,7 +209,7 @@ build {
 
   post-processor "docker-tag" {
     except     = ["vagrant.ubuntu"]
-    repository = "${var.docker_repo}:${var.img_tag}"
+    repository = var.docker_repo
   }
   post-processor "shell-local" {
     except = ["vagrant.ubuntu"]
