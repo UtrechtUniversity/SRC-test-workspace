@@ -60,7 +60,8 @@ jobs:
           echo changed_dirs="$CHANGED" >> "$GITHUB_OUTPUT"
       - id: set-images-matrix
         run: | # Add together the directories found in the changed-images-yaml and get-symlink-dirs steps into a single matrix
-          MATRIX=(${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }} )
+          ALL_DIRS="${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }}"
+          MATRIX=($(echo "$ALL_DIRS" | xargs -n 1 | sort -u)) # Construct a unique array out of ALL_DIRS
           MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)
           echo matrix={\"images\": $MATRIX} >> $GITHUB_OUTPUT
     outputs:
