@@ -4,14 +4,11 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
 
   define_images:
-    # Define a matrix based on all changed *.hcl files so we can run packer only for image definitions that have actually changed
+    # Define a build matrix based on all changed *.hcl files so we can run packer only for image definitions that have actually changed
     # So if e.g. ubuntu/focal/variables.auto.pkrvars.hcl or ubuntu/focal/src-ubuntu.pkr.hcl changes, add "ubuntu/focal" to the matrix
     # Also ensure that if an image template (for instance, the general template for ubuntu images 'ubuntu/src-ubuntu.pkr.hcl') changes,
     # an entry is added to the matrix for each image definition that relies on (i.e. symlinks) it.
@@ -32,8 +29,8 @@ jobs:
           files_yaml: |
             images:
               - '*/*/*.hcl'
-      - name: Get changed templates (symlinks)
-        # Find all templates (symlinks) in all <os>/ directories
+      - name: Get changed image definition templates
+        # Find all changed base templates in all <os>/ directories
         id: changed-symlink-yaml
         uses: tj-actions/changed-files@v39
         with:
@@ -42,7 +39,7 @@ jobs:
             symlinks:
               - '*/*.hcl'
       - name: Get image directories based on changed templates
-        # For every changed templates in an <os> directory, collect all <os>/<version> directories that contain a symlink to the template.
+        # For every changed template in an <os> directory, collect all <os>/<version> directories that contain a symlink to the template.
         # For instance, if ubuntu/src-ubunut.pkr.hcl changes, find all subdirectories of 'ubuntu' that contain links to that file
         # -> the result would be e.g. 'ubuntu/focal ubuntu/jammy ubuntu/focal_desktop'
         id: get-symlink-dirs
@@ -62,7 +59,7 @@ jobs:
         run: | # Add together the directories found in the changed-images-yaml and get-symlink-dirs steps into a single matrix
           ALL_DIRS="${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }}"
           MATRIX=($(echo "$ALL_DIRS" | xargs -n 1 | sort -u)) # Construct a unique array out of ALL_DIRS
-          MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)
+          MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .) # Construct a valid json array out of the bash array
           echo matrix={\"images\": $MATRIX} >> $GITHUB_OUTPUT
     outputs:
       images_matrix: ${{ steps.set-images-matrix.outputs.matrix }}
@@ -92,7 +89,5 @@ jobs:
         id: get-image-name
         run: |
           echo "docker_repo=`grep docker_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
-      - name: Debug
-        run: echo ${{ steps.get-image-name.outputs.image_name }}
       - name: Push image
         run: docker push ${{ steps.get-image-name.outputs.docker_repo }}
