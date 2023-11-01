@@ -62,14 +62,16 @@ jobs:
           ALL_DIRS="${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }}"
           MATRIX=($(echo "$ALL_DIRS" | xargs -n 1 | sort -u)) # Construct a unique array out of ALL_DIRS
           MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .) # Construct a valid json array out of the bash array
+          echo images=$MATRIX >> $GITHUB_OUTPUT
           echo matrix={\"images\": $MATRIX} >> $GITHUB_OUTPUT
     outputs:
+      images: ${{ steps.set-images-matrix.outputs.images }}
       images_matrix: ${{ steps.set-images-matrix.outputs.matrix }}
 
   build_and_deploy:
     needs: define_images
     runs-on: ubuntu-latest
-    if: ${{ needs.define_images.outputs.images_matrix != '[]' && needs.define_images.outputs.images_matrix != '' }}
+    if: ${{ needs.define_images.outputs.images != '[""]' && needs.define_images.outputs.images_matrix != '' }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.define_images.outputs.images_matrix) }}
