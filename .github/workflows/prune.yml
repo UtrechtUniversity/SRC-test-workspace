@@ -1,0 +1,18 @@
+
+on:
+  schedule:
+    - cron: '22 0 * * *' # 22 past midnight daily
+  workflow_dispatch:
+
+jobs:
+  prune_images:
+    runs-on: ubuntu-latest
+    steps:
+    # https://github.com/actions/delete-package-versions#delete-all-untagged-container-versions-except-y-latest-untagged-versions
+    - name: Prune untagged images from ghcr
+      uses: actions/delete-package-versions@v4
+      with: 
+        package-name: 'utrechtuniversity/src-test-workspace'
+        package-type: 'container'
+        min-versions-to-keep: 5 # ...but keep the latest n untagged images
+        delete-only-untagged-versions: 'true'
