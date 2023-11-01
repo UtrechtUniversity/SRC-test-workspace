@@ -45,18 +45,18 @@ provided.
 On top of the base Linux image, Packer will execute a number of Ansible playbooks. These are the three basic components provided by SURF that need to be present on any SRC workspace:
 
 1. SRC-OS
-1. SRC-CO (**currently not used**)
+1. SRC-CO
 1. SRC-External
 
 The repositories for these components are included in this repo as git submodules.
 
 ### SRC-OS
 
-Installs basic packages and servives, sets permissions, etc.
+Installs basic packages and services, sets permissions, etc.
 
 ### SRC-CO
 
-Provides SRAM authentication, SSH, etc. Currently not yet implemented. Instead, a local testuser (username `testuser`) is added to the image.
+Provides SRAM authentication, user and group provisioning, etc. Currently used with SRAM (totp) authenticationi disabled. A local testuser (username `testuser`) is added to the image.
 
 ### SRC-External
 
@@ -88,7 +88,3 @@ Packer will use the most recent version of the source OS images available on Doc
 
 Docker does not allow modifying `/etc/hosts` or `/etc/hostname`. The SRC-OS component tries to do just that. To work around this issue, this repository utilizes a [fork](https://github.com/UtrechtUniversity/src-plugin-os/tree/3afd56eb7f4e5ad53d2e91b35920205384cbe6f6) of the 
 component that adds tags to the tasks that attempt to modify the `/etc/host*` files. Tasks with these tags are skipped by ansible (as defined in the Packer template).
-
-### No SRC-component
-
-As explained above, the SRC-CO component is currenly not used. This is to avoid containers trying to connect to SURF to authorize (and fail).
