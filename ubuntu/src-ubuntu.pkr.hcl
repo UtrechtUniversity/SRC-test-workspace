@@ -138,7 +138,7 @@ source "docker" "ubuntu" {
   platform    = var.target_arch
   pull        = true
   commit      = true
-  run_command = ["-d", "-i", "-t", "--name", local.ansible_host, "{{.Image}}", "/bin/bash"]
+  run_command = ["-d", "-i", "-t", "--name", local.ansible_host, var.docker_base_img, "/bin/bash"]
   changes = [
     "LABEL org.opencontainers.image.source=${var.source_repo}"
   ]
@@ -159,27 +159,15 @@ build {
     inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"]
   }
 
-  # Begin Docker specific provisioning
   provisioner "ansible" {
-    only          = ["docker.ubuntu"]
     playbook_file = "./plugin-os/plugin-os.yml"
     extra_arguments = concat(var.common_ansible_args, [
       "--skip-tags",
       "skip_on_container",
-    ])
-  }
-  # End Docker specific provisioning
-
-  # Begin Vagrant specific provisioning
-  provisioner "ansible" {
-    except        = ["docker.ubuntu"]
-    playbook_file = "./plugin-os/plugin-os.yml"
-    extra_arguments = concat(var.common_ansible_args, [
       "--extra-vars",
       "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${local.ansible_host}.test",
     ])
   }
-  # End Vagrant specific provisioning
 
   provisioner "shell" {
     inline = ["useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}"]
@@ -208,11 +196,11 @@ build {
   }
 
   post-processor "docker-tag" {
-    except     = ["vagrant.ubuntu"]
+    only       = ["docker.ubuntu"]
     repository = var.docker_repo
   }
   post-processor "shell-local" {
-    except = ["vagrant.ubuntu"]
+    only   = ["docker.ubuntu"]
     inline = ["docker system prune -f"]
   }
 }
