@@ -58,12 +58,13 @@ jobs:
                 fi
               done
           done
+          echo "Debug: " $CHANGED
           # Store the results
           echo changed_dirs="$CHANGED" >> "$GITHUB_OUTPUT"
       - id: set-images-matrix
         run: |
           # First add together the directories found in the changed-images-yaml and changed-templates-yaml steps into a single array
-          ALL_DIRS="${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-changed-templates.outputs.changed_dirs }}"
+          ALL_DIRS="${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }}"
           # Now construct a unique array out of ALL_DIRS
           MATRIX=($(echo "$ALL_DIRS" | xargs -n 1 | sort -u))
           # Next create a valid json array out of the bash array using jq
