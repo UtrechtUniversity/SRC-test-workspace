@@ -66,6 +66,11 @@ variable "extra_packages" {
   type    = string
 }
 
+variable "extra_post_commands" {
+  default = ""
+  type    = string
+}
+
 variable "testuser" {
   type = map(string)
   default = {
@@ -191,7 +196,8 @@ build {
     inline = [
       "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}",
       "apt-get autoremove -y -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*",
-      "mkdir -p /usr/share/man/man1" # The step aboved removed all the man pages content, but this directory needs to be present as an install target for subsequent apt installs by components.
+      "mkdir -p /usr/share/man/man1", # The step above removed all the man pages content, but this directory needs to be present as an install target for subsequent apt installs by components.
+      var.extra_post_commands
     ]
   }
 
