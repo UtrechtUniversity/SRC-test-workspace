@@ -8,12 +8,42 @@ jobs:
   prune_images:
     runs-on: ubuntu-latest
     steps:
-    # https://github.com/actions/delete-package-versions#delete-all-untagged-container-versions-except-y-latest-untagged-versions
-    - name: Prune untagged images from ghcr
-      uses: actions/delete-package-versions@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        package-name: src-test-workspace
-        package-type: container
-        min-versions-to-keep: 3 # ...but keep the latest n untagged images
-        delete-only-untagged-versions: true
+      - uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.request("GET /${{ env.OWNER }}/packages/container/${{ env.PACKAGE_NAME }}/versions",
+              { per_page: ${{ env.PER_PAGE }}
+            });
+            empty_tag_versions = response.data.versions.filter(function(version) {
+                return version.metadata.container.tags.length == 0;
+              }
+            )
+            sort_by_created_date = function(a, b) {
+              date_a = new Date(a.created_at)
+              date_b = new Date(b.created_at)
+              // Oldest first
+              if ( date_a > date_b) {
+                return 1;
+              } else if ( date_b > date_a ) {
+                return -1;
+              } else {
+                return 0;
+              }
+            }
+
+            empty_tag_versions.sort(sort_by_created_date)
+
+            num_to_delete =  empty_tag_versions.length - ${{ env.KEEP_MIN }}
+            console.log("Number of versions to delete: " + num_to_delete)
+            for (let i = 0; i < num_to_delete; i++){
+              version = empty_tag_versions[i]
+              console.log("delete " + version.id)
+              const deleteResponse = await github.request("DELETE /${{ env.OWNER }}/packages/container/${{ env.PACKAGE_NAME }}/versions/" + version.id, { });
+              console.log("status " + deleteResponse.status)
+            }
+        env:
+          OWNER: orgs/UtrechtUniversity
+          PACKAGE_NAME: src-test-workspace
+          KEEP_MIN: 3
+          PER_PAGE: 100
