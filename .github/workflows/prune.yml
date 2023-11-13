@@ -11,7 +11,8 @@ jobs:
     # https://github.com/actions/delete-package-versions#delete-all-untagged-container-versions-except-y-latest-untagged-versions
     - name: Prune untagged images from ghcr
       uses: actions/delete-package-versions@v4
-      with: 
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         package-name: 'src-test-workspace'
         package-type: 'container'
         min-versions-to-keep: 3 # ...but keep the latest n untagged images
