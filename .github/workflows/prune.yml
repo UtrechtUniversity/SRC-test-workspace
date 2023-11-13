@@ -10,15 +10,15 @@ jobs:
     steps:
       - uses: actions/github-script@v6
         with:
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Based on https://github.com/orgs/community/discussions/26716#discussioncomment-3253034
+          # Thanks to @jcansdale
           script: |
             const response = await github.request("GET /${{ env.OWNER }}/packages/container/${{ env.PACKAGE_NAME }}/versions",
               { per_page: ${{ env.PER_PAGE }}
             });
 
-            console.log(response);
-
-            empty_tag_versions = response.data.versions.filter(function(version) {
+            empty_tag_versions = response.data.filter(function(version) {
                 return version.metadata.container.tags.length == 0;
               }
             )
@@ -37,14 +37,17 @@ jobs:
 
             empty_tag_versions.sort(sort_by_created_date)
 
-            # num_to_delete =  empty_tag_versions.length - ${{ env.KEEP_MIN }}
-            # console.log("Number of versions to delete: " + num_to_delete)
-            # for (let i = 0; i < num_to_delete; i++){
-            #   version = empty_tag_versions[i]
-            #   console.log("delete " + version.id)
-            #   const deleteResponse = await github.request("DELETE /${{ env.OWNER }}/packages/container/${{ env.PACKAGE_NAME }}/versions/" + version.id, { });
-            #   console.log("status " + deleteResponse.status)
-            # }
+            console.log(empty_tag_versions)
+
+            num_to_delete =  empty_tag_versions.length - ${{ env.KEEP_MIN }}
+            console.log("Number of versions to delete: " + num_to_delete)
+            for (let i = 0; i < num_to_delete; i++){
+              version = empty_tag_versions[i]
+              console.log("delete " + version.id)
+              const deleteResponse = await github.request("DELETE /${{ env.OWNER }}/packages/container/${{ env.PACKAGE_NAME }}/versions/" + version.id, { });
+              console.log("status " + deleteResponse.status)
+            }
+
         env:
           OWNER: orgs/UtrechtUniversity
           PACKAGE_NAME: src-test-workspace
