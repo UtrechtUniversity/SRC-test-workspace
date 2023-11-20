@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
           # Based on https://github.com/orgs/community/discussions/26716#discussioncomment-3253034
           # Thanks to @jcansdale
           script: |
