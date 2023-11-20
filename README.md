@@ -67,13 +67,6 @@ cd plugin-co
 git checkout <your-sha>
 ```
 
-
-If you want to use a specific version of one of the subrepos, just change `.gitmodules`:
-
-```
-
-```
-
 # Templates
 
 The `pack.sh` scripts expects the templates to live in this repository, with the following directory structure:
