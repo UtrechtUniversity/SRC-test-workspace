@@ -1,4 +1,5 @@
-
+---
+name: Prune Untagged Images
 on:
   schedule:
     - cron: '22 0 * * *' # 22 past midnight daily
@@ -50,6 +51,6 @@ jobs:
 
         env:
           OWNER: orgs/UtrechtUniversity
-          PACKAGE_NAME: src-test-workspace
+          PACKAGE_NAME: SRC-test-workspace
           KEEP_MIN: 3
           PER_PAGE: 100

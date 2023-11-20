@@ -1,5 +1,5 @@
 ---
-name: Build and Deploy All Images Manually
+name: Manually Build and Deploy All Images
 on:
   workflow_dispatch:
 
@@ -11,7 +11,7 @@ jobs:
       matrix:
         images:
           - ubuntu/focal
-          - ubuntu/focal-desktop
+          - ubuntu/focal_desktop
           - ubuntu/jammy
     steps:
       - name: Checkout
