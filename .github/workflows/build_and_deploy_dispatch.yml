@@ -1,0 +1,37 @@
+---
+name: Build and Deploy All Images Manually
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        images:
+          - ubuntu/focal
+          - ubuntu/focal-desktop
+          - ubuntu/jammy
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Update submodules to latest version
+        run: git submodule update --recursive --remote
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        id: build-image
+        run: IMG=${{ matrix.images }} ./pack.sh docker
+      - name: Get image name and tag # grep in the image directory's variables file to find the image name/tag to push to
+        id: get-image-name
+        run: |
+          echo "docker_repo=`grep docker_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
+      - name: Push image
+        run: docker push ${{ steps.get-image-name.outputs.docker_repo }}
