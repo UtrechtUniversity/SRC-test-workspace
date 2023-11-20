@@ -54,6 +54,26 @@ REPOSITORY                                     TAG                    IMAGE ID  
 ghcr.io/utrechtuniversity/src-test-workspace   ubuntu_jammy           41bbc80e345f   5 days ago      438MB
 ```
 
+### Submodule updates
+
+This repository contains a number of subrepos (see [below](#how-it-works)). To update them all to the latest version:
+
+`git submodule update --recursive --remote`
+
+To update a specific one to a specific version, do for example:
+
+```bash
+cd plugin-co
+git checkout <your-sha>
+```
+
+
+If you want to use a specific version of one of the subrepos, just change `.gitmodules`:
+
+```
+
+```
+
 # Templates
 
 The `pack.sh` scripts expects the templates to live in this repository, with the following directory structure:
@@ -90,9 +110,9 @@ As you can see, for the Ubuntu packages, the templates in `ubuntu/<version>/` ac
 
 The image defintions are designed to be:
 
-a. as lightweight as possible, while...
-b. still providing an accurate enough representation of an SRC workspace for testing purposes, and...
-c. making tests run as fast as possible.
+1. as lightweight as possible, while...
+2. still providing an accurate enough representation of an SRC workspace for testing purposes, and...
+3. making tests run as fast as possible.
 
 This means, for example, that we don't try to include *every* package present on an SRC Ubuntu workspace (lightweight), but we *do* make sure that Ansible is preinstalled on the image (see [below](#how-it-works), so this does not have to be done during each test run.
 
@@ -106,7 +126,7 @@ On top of the base Linux image, Packer will execute a number of shell scripts, a
 1. SRC-CO
 1. SRC-External
 
-The repositories for these components are included in this repo as git submodules. (For the package build that runs in GitHub actions, the latest version of the `main` branch for each of these repositories is automatically checked out.)
+The repositories for these components are included in this repo as git submodules.
 
 ### SRC-OS
 
@@ -143,4 +163,8 @@ Docker does not allow modifying `/etc/hosts` or `/etc/hostname`. The SRC-OS comp
 
 # CI
 
-The CI build-and-deploy task will run the `pack.sh` script on each template directory (`<os>/<version>`) that was changed in the pushed commit. It also detects if a symlinked template file is changed, and then run `pack.sh` on each template that relies on it. So for instance, if `ubuntu/src-ubuntu.pkr.hcl` is changed, the build is run for all the subdirectories of `ubuntu`: `ubuntu/focal`, `ubuntu/jammy`, `ubuntu_focal-desktop`.
+The CI `build_and_deploy` workflow will run the `pack.sh` script on each template directory (`<os>/<version>`) that was changed in the pushed commit. It also detects if a symlinked template file is changed, and then run `pack.sh` on each template that relies on it. So for instance, if `ubuntu/src-ubuntu.pkr.hcl` is changed, the build is run for all the subdirectories of `ubuntu`: `ubuntu/focal`, `ubuntu/jammy`, `ubuntu_focal-desktop`.
+
+The `build_and_deploy` workflow checks out the latest version of all the submodules, so the image builds are always based on the latest version of them.
+
+The `prune` workflow runs once a day (or when manually triggered), and will remove all untagged image versions except for the newest three. This ensures that when a new version of an image is built (and receives its tags), older versions are removed -- but we always keep some old versions of the images.
