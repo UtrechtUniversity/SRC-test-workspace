@@ -43,6 +43,8 @@ else
   printf -v joined_targets '%s,' "${TARGETS[@]}"
 fi
 
+git submodule update --recursive --remote # Update git submodules
+
 CMD="packer init $IMG && packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG"
 echo "Running: $CMD"
 eval "$CMD";
