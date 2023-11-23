@@ -58,7 +58,7 @@ variable "base_packages" {
   # If we don't, jinja2 will be installed by pip as a dependency of ansible (in the external plugin)
   # That will cause version 3.1 of jinja to be installed, and this is not compatible with ansible 2.9.
   # Ansible 2.9.22 fixes this issue: https://github.com/ansible/ansible/issues/77413
-  default = "python3 python3-jinja2 systemd sudo openssl git gpg gpg-agent cron rsync init"
+  default = "python3 python3-jinja2 systemd sudo openssl git gpg gpg-agent cron rsync init tzdata"
   type    = string
 }
 
