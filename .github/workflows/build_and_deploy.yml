@@ -21,7 +21,7 @@ jobs:
       - name: Get changed image definitions
         # Find changed .hcl files in all <os>/<version> directories
         id: changed-images-yaml
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v41
         with:
           path: "${{ github.repository }}"
           dir_names: true
@@ -33,7 +33,7 @@ jobs:
       - name: Get changed image definition templates
         # Find all changed base templates in all <os>/ directories
         id: changed-symlink-yaml
-        uses: tj-actions/changed-files@v39
+        uses: tj-actions/changed-files@v41
         with:
           path: "${{ github.repository }}"
           quotepath: false
