@@ -2,7 +2,7 @@
 name: Prune Untagged Images
 on:
   schedule:
-    - cron: '22 0 * * *' # 22 past midnight daily
+    - cron: '22 1 * * *' # 22 past 1am daily
   workflow_dispatch:
 
 jobs:
