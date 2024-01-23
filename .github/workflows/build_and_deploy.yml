@@ -94,6 +94,8 @@ jobs:
         run: git submodule update --recursive --remote
       - name: Install specific ansible-core version
         run: pip install ansible-core==${{ env.ANSIBLE_VERSION }}
+      - name: Install ansible dependencies
+        run: ansible-galaxy collection install -r requirements.yml
       - name: Debug ansible version
         run: ansible-playbook --version
       - name: Login to GitHub Container Registry

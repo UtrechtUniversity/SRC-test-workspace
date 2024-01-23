@@ -25,6 +25,8 @@ jobs:
           run: pip install ansible-core==${{ env.ANSIBLE_VERSION }}
         - name: Debug ansible version
           run: ansible-playbook --version
+        - name: Install ansible dependencies
+          run: ansible-galaxy collection install -r requirements.yml
         - name: Update submodules to latest version
           run: git submodule update --recursive --remote
         - name: Login to GitHub Container Registry
