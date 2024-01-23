@@ -14,11 +14,17 @@ jobs:
             - ubuntu/focal
             - ubuntu/jammy
             - ubuntu/focal_desktop
+      env:
+        ANSIBLE_VERSION: 2.15.5      
       steps:
         - name: Checkout
           uses: actions/checkout@v4
           with:
             submodules: recursive
+        - name: Install specific ansible-core version
+          run: pip install ansible-core==${{ env.ANSIBLE_VERSION }}
+        - name: Debug ansible version
+          run: ansible-playbook --version
         - name: Update submodules to latest version
           run: git submodule update --recursive --remote
         - name: Login to GitHub Container Registry
