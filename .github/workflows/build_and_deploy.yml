@@ -80,6 +80,8 @@ jobs:
     needs: define_images
     runs-on: ubuntu-latest
     if: ${{ needs.define_images.outputs.images != '[""]' && needs.define_images.outputs.images_matrix != '' }}
+    env:
+      ANSIBLE_VERSION: 2.15.5
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.define_images.outputs.images_matrix) }}
@@ -90,6 +92,10 @@ jobs:
           submodules: recursive
       - name: Update submodules to latest version
         run: git submodule update --recursive --remote
+      - name: Install specific ansible-core version
+        run: pip install ansible-core==${{ env.ANSIBLE_VERSION }}
+      - name: Debug ansible version
+        run: ansible-playbook --version
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
