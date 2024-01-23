@@ -2,7 +2,7 @@
 name: Weekly image build
 on:
   schedule:
-    - cron: '22 0 * * 1' # 22 past midnight on Monday
+    - cron: '22 0 * * 3' # 22 past midnight on Monday
 
 jobs:
   build_and_deploy:
