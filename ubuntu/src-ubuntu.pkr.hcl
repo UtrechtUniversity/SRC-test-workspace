@@ -171,7 +171,7 @@ build {
       "--skip-tags",
       "skip_on_container",
       "--extra-vars",
-      "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${local.ansible_host}.test",
+      "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${local.ansible_host}.test cloud_type=OpenStack",
     ])
   }
 
