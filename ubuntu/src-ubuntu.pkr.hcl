@@ -22,7 +22,7 @@ variable "enabled_sources" {
 }
 
 variable "workspace_ansible_version" {
-  default = "2.9"
+  default = "9.0.0"
   type    = string
 }
 
