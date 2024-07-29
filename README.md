@@ -1,6 +1,6 @@
 # SRC-test-workspace
 
-This repository provides a set of scripts and [Packer](https://www.packer.io/) image definitions for building container and VM images and containers that mimic a SURF Research Cloud (SRC) workspace, for development and testing/CI purposes. The Docker image built from this repo are published as a [GitHub package](https://github.com/orgs/UtrechtUniversity/packages/container/package/src-test-workspace) to https://ghcr.io. The following images are available:
+This repository provides a set of scripts and [Packer](https://www.packer.io/) image definitions for building container and VM images and containers that mimic a SURF Research Cloud (SRC) workspace, for development and testing/CI purposes. The container image built from this repo are published as a [GitHub package](https://github.com/orgs/UtrechtUniversity/packages/container/package/src-test-workspace) to https://ghcr.io. The following images are available:
 
 | Image name | Tag | Description|
 | -- | -- | -- |
@@ -15,7 +15,7 @@ The repository provides:
 
 Using these templates, you can build local containers or virtual machines that are as close to a workspace as it would be deployed on Research Cloud as possible!
 
-Each image definition can be used to build either container (Docker) images, or VM images. See [below](#Usage).
+Each image definition can be used to build either container images (using Docker or Podman), or VM images. See [below](#Usage).
 
 ## Requirements
 
@@ -28,9 +28,11 @@ Each image definition can be used to build either container (Docker) images, or 
 
 To create the default `ubuntu/focal` image:
 
-`./pack.sh [docker,vagrant]`
+`./pack.sh [docker,podman,vagrant]`
 
-For example, `./pack.sh docker` will generate a Docker container based on the template, while `./pack.sh vagrant` will create a vagrant VM based on the same.
+- `./pack.sh docker` will generate a Docker container.
+- `./pack.sh podman` will generate a Podman container.
+- `./pack.sh vagrant` will create a vagrant VM.
 
 To select a different image, use the `IMG` environment variable:
 

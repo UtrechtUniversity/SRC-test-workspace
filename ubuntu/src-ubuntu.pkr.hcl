@@ -85,7 +85,7 @@ variable "target_arch" {
   type    = string
 }
 
-variable "docker_base_img" {
+variable "container_base_img" {
   default = ""
   type    = string
 }
@@ -124,6 +124,10 @@ local "dummy_plugin_args" {
 
 packer {
   required_plugins {
+    podman = {
+      version = ">=v0.1.0"
+      source  = "github.com/polpetta/podman"
+    }
     docker = {
       version = "~> 1"
       source  = "github.com/hashicorp/docker"
@@ -139,12 +143,22 @@ packer {
   }
 }
 
-source "docker" "ubuntu" {
-  image       = var.docker_base_img
-  platform    = var.target_arch
-  pull        = true
+source "podman" "ubuntu" {
+  image       = var.container_base_img
+  pull        = false
   commit      = true
-  run_command = ["-d", "-i", "-t", "--name", local.ansible_host, var.docker_base_img, "/bin/bash"]
+  run_command = ["-d", "-i", "--platform", var.target_arch, "--systemd", "always", "--name", local.ansible_host, var.container_base_img, "/sbin/init"]
+  changes = [
+    "LABEL org.opencontainers.image.source=${var.source_repo}"
+  ]
+}
+
+source "docker" "ubuntu" {
+  image       = var.container_base_img
+  platform    = var.target_arch
+  pull        = false
+  commit      = true
+  run_command = ["-d", "-i", "-t", "--privileged", "--name", local.ansible_host, var.container_base_img, "/sbin/init"]
   changes = [
     "LABEL org.opencontainers.image.source=${var.source_repo}"
   ]
