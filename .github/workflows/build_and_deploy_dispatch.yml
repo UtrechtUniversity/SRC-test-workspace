@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         id: build-image
-        run: IMG=${{ matrix.images }} ./pack.sh docker
+        run: IMG=${{ matrix.images }} ./pack.sh podman
       - name: Get image name and tag # grep in the image directory's variables file to find the image name/tag to push to
         id: get-image-name
         run: |
