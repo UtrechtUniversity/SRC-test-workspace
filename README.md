@@ -40,6 +40,11 @@ To select a different image, use the `IMG` environment variable:
 
 Valid values for `IMG` are paths to directories containing the Packer templates, of the form `<os>/<version>` (for example, `ubuntu/jammy`).
 
+### Base container images
+
+Container images are built on top of the base images defined in the `base` directory. The Containerfiles in the subdirectories of that directory 
+simply add support for `systemd` to standard OS (e.g. Ubuntu) container images. The base images are built automatically by `pack.sh`.
+
 ### Architecture
 
 By default, images will be built for the `amd64` architecture. Set the `ARCH` environment variable to change this. For example:
