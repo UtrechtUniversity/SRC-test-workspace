@@ -7,6 +7,3 @@
 [submodule "plugin-co"]
 	path = plugin-co
 	url = https://gitlab.com/rsc-surf-nl/plugins/plugin-co.git
-[submodule "dummy-plugin"]
-	path = dummy-plugin
-	url = https://github.com/dometto/dummy-plugin.git
