@@ -1,0 +1,3 @@
+FROM docker.io/ubuntu:focal
+RUN apt update -y && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends systemd
+RUN ln -s /lib/systemd/systemd /sbin/init
