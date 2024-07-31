@@ -24,6 +24,8 @@ Each image definition can be used to build either container images (using Docker
 1. Docker (for building containers)
 1. Vagrant (for building virtual machines)
 
+Run `ansible-galaxy collection install -r requirements.yml` to install the required Ansible collections.
+
 ## Usage
 
 To create the default `ubuntu/focal` image:
@@ -95,7 +97,7 @@ ubuntu
 ├── focal
 │   ├── src-ubuntu.pkr.hcl -> ../src-ubuntu.pkr.hcl
 │   └── variables.auto.pkrvars.hcl
-├── focal_desktop
+├──cfo-al_desktop
 │   ├── src-ubuntu.pkr.hcl -> ../src-ubuntu.pkr.hcl
 │   └── variables.auto.pkrvars.hcl
 ├── jammy

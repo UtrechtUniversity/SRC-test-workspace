@@ -13,7 +13,7 @@ jobs:
           images:
             - ubuntu/focal
             - ubuntu/jammy
-            - ubuntu/focal_desktop
+            - ubuntu/focal-desktop
       env:
         ANSIBLE_VERSION: 2.15.5      
       steps:
