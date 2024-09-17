@@ -66,12 +66,13 @@ jobs:
           # First add together the directories found in the changed-images-yaml and changed-templates-yaml steps into a single array
           ALL_DIRS="${{ steps.changed-images-yaml.outputs.images_all_changed_files }} ${{ steps.get-symlink-dirs.outputs.changed_dirs }}"
           # Now construct a unique array out of ALL_DIRS
-          MATRIX=($(echo "$ALL_DIRS" | xargs -n 1 | sort -u))
+          IMGS=($(echo "$ALL_DIRS" | xargs -n 1 | sort -u))
           # Next create a valid json array out of the bash array using jq
-          MATRIX=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)
+          IMGS=$(printf '%s\n' "${MATRIX[@]}" | jq -R . | jq -c -s .)
           # Store the results
-          echo images=$MATRIX >> $GITHUB_OUTPUT
-          echo matrix={\"images\": $MATRIX} >> $GITHUB_OUTPUT
+          echo images=$IMGS >> $GITHUB_OUTPUT
+          # Create a matrix variable containing the images array and update_base_component array
+          echo matrix={\"update_base_components\": [true, false], \"images\": $IMGS} >> $GITHUB_OUTPUT
     outputs:
       images: ${{ steps.set-images-matrix.outputs.images }}
       images_matrix: ${{ steps.set-images-matrix.outputs.matrix }}
@@ -104,10 +105,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         id: build-image
-        run: IMG=${{ matrix.images }} ./pack.sh docker
+        run: IMG=${{ matrix.images }} UPDATE_BASE_COMPONENTS=${{ matrix.update_base_components }} ./pack.sh docker
       - name: Get image name and tag # grep in the image directory's variables file to find the image name/tag to push to
         id: get-image-name
         run: |
           echo "docker_repo=`grep docker_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
       - name: Push image
-        run: docker push ${{ steps.get-image-name.outputs.docker_repo }}
+        run: docker push ${{ steps.get-image-name.outputs.docker_repo }}${{ matrix.update_base_components && '-pilot' || '' }}
