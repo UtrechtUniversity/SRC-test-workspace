@@ -43,4 +43,4 @@ jobs:
         run: |
           echo "docker_repo=`grep docker_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
       - name: Push image
-        run: docker push ${{ steps.get-image-name.outputs.docker_repo }}${{ matrix.update_base_components && '' || '-pilot' }}
+        run: docker push ${{ steps.get-image-name.outputs.docker_repo }}${{ matrix.update_base_components && '-pilot' || '' }}
