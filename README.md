@@ -2,11 +2,15 @@
 
 This repository provides a set of scripts and [Packer](https://www.packer.io/) image definitions for building container and VM images and containers that mimic a SURF Research Cloud (SRC) workspace, for development and testing/CI purposes. The container image built from this repo are published as a [GitHub package](https://github.com/orgs/UtrechtUniversity/packages/container/package/src-test-workspace) to https://ghcr.io. The following images are available:
 
-| Image name | Tag | Description|
+| Image name | Tag | Description |
 | -- | -- | -- |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal | Ubuntu 20.04 |
-| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-desktop | Ubuntu 20.04 with xfce4 |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal_desktop | Ubuntu 20.04 with xfce4 |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy | Ubuntu 22.04 |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-pilot | Ubuntu 20.04, latest version of [base components](#how-it-works). |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal_desktop-pilot | Ubuntu 20.04 with xfce4, latest version of [base components](#how-it-works) |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-pilot | Ubuntu 22.04, latest version of [base components](#how-it-works) |
+
 
 The repository provides:
 
@@ -75,6 +79,8 @@ To update a specific one to a specific version, do for example:
 cd plugin-co
 git checkout <your-sha>
 ```
+
+To make `pack.sh` update submodules to the latest version, set the `UPDATE_BASE_COMPONENTS` environment variable to `true`.
 
 # Templates
 
