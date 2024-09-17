@@ -1,4 +1,4 @@
-docker_repo               = "ghcr.io/utrechtuniversity/src-test-workspace:ubuntu_focal-desktop"
+container_repo               = "ghcr.io/utrechtuniversity/src-test-workspace:ubuntu_focal-desktop"
 img_tag                   = "ubuntu_focal-desktop"
 container_base_img        = "src-base-ubuntu_focal-desktop:latest"
 vagrant_base_img          = "ubuntu/focal64"

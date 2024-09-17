@@ -3,7 +3,7 @@ variable "source_repo" {
   type    = string
 }
 
-variable "docker_repo" {
+variable "container_repo" {
   default = ""
   type    = string
 }
@@ -225,7 +225,7 @@ build {
 
   post-processor "docker-tag" {
     only       = ["docker.ubuntu"]
-    repository = "${var.docker_repo}${var.img_tag_suffix}"
+    repository = "${var.container_repo}${var.img_tag_suffix}"
   }
   post-processor "shell-local" {
     only   = ["docker.ubuntu"]
