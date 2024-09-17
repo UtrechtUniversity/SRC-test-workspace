@@ -10,10 +10,13 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
+          update_base_components:
+            - true
+            - false
           images:
             - ubuntu/focal
             - ubuntu/jammy
-            - ubuntu/focal-desktop
+            - ubuntu/focal-desktop 
       env:
         ANSIBLE_VERSION: 2.15.5      
       steps:
@@ -27,8 +30,6 @@ jobs:
           run: ansible-playbook --version
         - name: Install ansible dependencies
           run: ansible-galaxy collection install -r requirements.yml
-        - name: Update submodules to latest version
-          run: git submodule update --recursive --remote
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v3
           with:
@@ -37,10 +38,10 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
         - name: Build image
           id: build-image
-          run: IMG=${{ matrix.images }} ./pack.sh docker
+          run: IMG=${{ matrix.images }} UPDATE_BASE_COMPONENTS=${{ matrix.update_base_components }} ./pack.sh docker
         - name: Get image name and tag # grep in the image directory's variables file to find the image name/tag to push to
           id: get-image-name
           run: |
             echo "docker_repo=`grep docker_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
         - name: Push image
-          run: docker push ${{ steps.get-image-name.outputs.docker_repo }}
+          run: docker push ${{ steps.get-image-name.outputs.docker_repo }}${{ matrix.update_base_components && '' || '-pilot' }}

@@ -8,6 +8,11 @@ then
   exit 1
 fi
 
+if [ -z "$UPDATE_BASE_COMPONENTS" ]
+then
+  UPDATE_BASE_COMPONENTS=false
+fi
+
 if [ -z "$IMG" ]
 then
   IMG="ubuntu/focal"
@@ -61,8 +66,13 @@ else
   printf -v joined_targets '%s,' "${TARGETS[@]}"
 fi
 
-git submodule update --recursive --remote # Update git submodules
+if [[ "$UPDATE_BASE_COMPONENTS" == true ]]
+then
+  echo "Updating submodules..."
+  git submodule update --recursive --remote # Update git submodules
+  IMG_TAG_SUFFIX="-var img_tag_suffix=-pilot"
+fi
 
-CMD="packer init $IMG && packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG"
+CMD="packer init $IMG && packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG_TAG_SUFFIX $IMG"
 echo "Running: $CMD"
 eval "$CMD";

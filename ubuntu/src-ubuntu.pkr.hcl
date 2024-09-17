@@ -21,6 +21,11 @@ variable "enabled_sources" {
   type = list(string)
 }
 
+variable "img_tag_suffix" {
+  default = "" # no tag suffix by default
+  type    = string
+}
+
 variable "workspace_ansible_version" {
   default = "9.1.0"
   type    = string
@@ -58,7 +63,7 @@ variable "base_packages" {
   # If we don't, jinja2 will be installed by pip as a dependency of ansible (in the external plugin)
   # That will cause version 3.1 of jinja to be installed, and this is not compatible with ansible 2.9.
   # Ansible 2.9.22 fixes this issue: https://github.com/ansible/ansible/issues/77413
-  default = "python3 python3-jinja2 systemd sudo openssl git gpg gpg-agent cron rsync init tzdata ssh"
+  default = "python3 python3-jinja2 python3-virtualenv systemd sudo openssl git gpg gpg-agent cron rsync init tzdata ssh"
   type    = string
 }
 
@@ -211,6 +216,7 @@ build {
     inline = [
       "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}",
       "mkdir -p /etc/rsc/ && echo ${var.testuser.username} > /etc/rsc/managedgroups",
+      "mkdir -p /var/tmp",
       "apt-get autoremove -y -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*",
       "mkdir -p /usr/share/man/man1", # The step above removed all the man pages content, but this directory needs to be present as an install target for subsequent apt installs by components.
       var.extra_post_commands
@@ -219,7 +225,7 @@ build {
 
   post-processor "docker-tag" {
     only       = ["docker.ubuntu"]
-    repository = var.docker_repo
+    repository = "${var.docker_repo}${var.img_tag_suffix}"
   }
   post-processor "shell-local" {
     only   = ["docker.ubuntu"]
