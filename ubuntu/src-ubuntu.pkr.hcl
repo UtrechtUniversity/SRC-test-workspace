@@ -16,7 +16,8 @@ variable "ansible_host" {
 variable "enabled_sources" {
   default = [
     "source.vagrant.ubuntu",
-    "source.docker.ubuntu"
+    "source.docker.ubuntu",
+    "source.podman.ubuntu",
   ]
   type = list(string)
 }
