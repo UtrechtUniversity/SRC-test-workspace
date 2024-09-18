@@ -8,7 +8,7 @@ This repository provides a set of scripts and [Packer](https://www.packer.io/) i
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal_desktop | Ubuntu 20.04 with xfce4 |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy | Ubuntu 22.04 |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-pilot | Ubuntu 20.04, latest version of [base components](#how-it-works). |
-| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal_desktop-pilot | Ubuntu 20.04 with xfce4, latest version of [base components](#how-it-works) |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-desktop-pilot | Ubuntu 20.04 with xfce4, latest version of [base components](#how-it-works) |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-pilot | Ubuntu 22.04, latest version of [base components](#how-it-works) |
 
 
