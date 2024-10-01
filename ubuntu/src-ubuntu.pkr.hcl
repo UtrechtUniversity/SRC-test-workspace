@@ -27,11 +27,6 @@ variable "img_tag_suffix" {
   type    = string
 }
 
-variable "workspace_ansible_version" {
-  default = "9.1.0"
-  type    = string
-}
-
 variable "common_ansible_args" {
   default = [
     "-b",
@@ -117,7 +112,6 @@ local "ansible_host" {
 
 local "dummy_plugin_args" {
   expression = {
-    "remote_ansible_version" = "${var.workspace_ansible_version}",
     "remote_plugin" = {
       "script_type"   = "Ansible PlayBook",
       "script_folder" = "../dummy-plugin",
