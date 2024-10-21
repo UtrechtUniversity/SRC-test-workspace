@@ -22,11 +22,6 @@ variable "enabled_sources" {
   type = list(string)
 }
 
-variable "img_tag_suffix" {
-  default = "" # no tag suffix by default
-  type    = string
-}
-
 variable "workspace_ansible_version" {
   default = "9.1.0"
   type    = string
@@ -64,7 +59,7 @@ variable "base_packages" {
   # If we don't, jinja2 will be installed by pip as a dependency of ansible (in the external plugin)
   # That will cause version 3.1 of jinja to be installed, and this is not compatible with ansible 2.9.
   # Ansible 2.9.22 fixes this issue: https://github.com/ansible/ansible/issues/77413
-  default = "python3 python3-jinja2 python3-virtualenv systemd sudo openssl git gpg gpg-agent cron rsync init tzdata ssh"
+  default = "python3 python3-jinja2 python3-virtualenv openssl git gpg gpg-agent cron rsync init tzdata ssh"
   type    = string
 }
 
@@ -153,7 +148,7 @@ source "podman" "ubuntu" {
   image       = var.container_base_img
   pull        = false
   commit      = true
-  run_command = ["-d", "-i", "--platform", var.target_arch, "--systemd", "always", "--name", local.ansible_host, var.container_base_img, "/sbin/init"]
+  run_command = ["-d", "-i", "--platform", var.target_arch, "--name", local.ansible_host, "${var.container_base_img}", "/sbin/init"]
   changes = [
     "LABEL org.opencontainers.image.source=${var.source_repo}"
   ]
@@ -181,7 +176,7 @@ build {
   sources = var.enabled_sources
 
   provisioner "shell" {
-    only   = ["docker.ubuntu"]
+    only   = ["docker.ubuntu", "podman.ubuntu"]
     inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"]
   }
 
@@ -189,7 +184,7 @@ build {
     playbook_file = "./plugin-os/plugin-os.yml"
     extra_arguments = concat(var.common_ansible_args, [
       "--skip-tags",
-      "skip_on_container",
+      "skip_on_container,molecule-notest,molecule-idempotence-notest",
       "--extra-vars",
       "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${local.ansible_host}.test cloud_type=OpenStack",
     ])
@@ -222,12 +217,19 @@ build {
       "mkdir -p /usr/share/man/man1", # The step above removed all the man pages content, but this directory needs to be present as an install target for subsequent apt installs by components.
       var.extra_post_commands
     ]
+    inline_shebang = "/bin/sh -ex"
   }
 
   post-processor "docker-tag" {
     only       = ["docker.ubuntu"]
-    repository = "${var.container_repo}${var.img_tag_suffix}"
+    repository = "${var.container_repo}"
   }
+
+  post-processor "shell-local" {
+    only   = ["podman.ubuntu"]
+    inline = ["podman tag ${build.ImageSha256} ${var.container_repo}", "podman system prune -f"]
+  }
+
   post-processor "shell-local" {
     only   = ["docker.ubuntu"]
     inline = ["docker system prune -f"]
