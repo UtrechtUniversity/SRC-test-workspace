@@ -39,6 +39,7 @@ build_base_img() {
   BASE_BUILD_ARGS="build -t src-base-$BASE_IMG_NAME $BASE_IMG_PATH/$OS_NAME -f $BASE_IMG_PATH/$OS_NAME/Containerfile_$OS_VERSION --platform $ARCH"
 
   echo "Building base image for $OS_NAME $OS_VERSION $ARCH"
+  echo "Build command: $cmd $BASE_BUILD_ARGS"
   eval "$cmd $BASE_BUILD_ARGS"
 }
 
