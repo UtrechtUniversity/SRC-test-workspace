@@ -184,7 +184,7 @@ build {
     playbook_file = "./plugin-os/plugin-os.yml"
     extra_arguments = concat(var.common_ansible_args, [
       "--skip-tags",
-      "skip_on_container,molecule-notest,molecule-idempotence-notest",
+      "molecule-notest,molecule-idempotence-notest",
       "--extra-vars",
       "rsc_os_ip=127.0.0.1 rsc_os_fqdn=${local.ansible_host}.test cloud_type=OpenStack",
     ])
