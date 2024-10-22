@@ -8,6 +8,12 @@ variable "container_repo" {
   type    = string
 }
 
+# pack.sh will set this variable to "-pilot" for pilot versions of the images
+variable "img_tag_suffix" {
+  default = ""
+  type    = string
+}
+
 variable "ansible_host" {
   default = "packer-src"
   type    = string
@@ -222,12 +228,12 @@ build {
 
   post-processor "docker-tag" {
     only       = ["docker.ubuntu"]
-    repository = "${var.container_repo}"
+    repository = "${var.container_repo}${var.img_tag_suffix}"
   }
 
   post-processor "shell-local" {
     only   = ["podman.ubuntu"]
-    inline = ["podman tag ${build.ImageSha256} ${var.container_repo}", "podman system prune -f"]
+    inline = ["podman tag ${build.ImageSha256} ${var.container_repo}${var.img_tag_suffix}", "podman system prune -f"]
   }
 
   post-processor "shell-local" {
