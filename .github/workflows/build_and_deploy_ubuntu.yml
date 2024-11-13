@@ -3,7 +3,7 @@ name: Build and Deploy Ubuntu images
 on:
   schedule:
     - cron: '22 0 * * 1' # 22 past midnight on Monday
-  worklow_dispatch:
+  workflow_dispatch:
   push:
     branches:
       - main
