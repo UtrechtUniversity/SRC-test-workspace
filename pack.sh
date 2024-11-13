@@ -13,6 +13,11 @@ then
   UPDATE_BASE_COMPONENTS=false
 fi
 
+if [ -z "$BUILD_BASE_IMG" ]
+then
+  BUILD_BASE_IMG=true
+fi
+
 if [ -z "$IMG" ]
 then
   IMG="ubuntu/focal"
@@ -34,6 +39,7 @@ VAGRANT_SRC="\"sources.vagrant.ubuntu\""
 TARGETS=()
 
 build_base_img() {
+  if [[ "$BUILD_BASE_IMG" == false ]]; then return; fi
   cmd="${1:-docker}"
   BASE_IMG_NAME="$OS_NAME"_"$OS_VERSION"
   BASE_BUILD_ARGS="build -t src-base-$BASE_IMG_NAME $BASE_IMG_PATH/$OS_NAME -f $BASE_IMG_PATH/$OS_NAME/Containerfile_$OS_VERSION --platform $ARCH"
