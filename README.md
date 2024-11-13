@@ -12,6 +12,8 @@ This repository provides a set of scripts and [Packer](https://www.packer.io/) i
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-desktop-pilot | Ubuntu 20.04 with xfce4, latest version of [base components](#how-it-works) |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-pilot | Ubuntu 22.04, latest version of [base components](#how-it-works) |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-desktop-pilot | Ubuntu 22.04 with xfce4, latest version of [base components](#how-it-works) |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-nginx | Ubuntu 22.04 with [Nginx component](https://github.com/utrechtuniversity/src-component-nginx) |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-nginx-pilot | Ubuntu 22.04 with [Nginx component](https://github.com/utrechtuniversity/src-component-nginx), latest version of [base components](#how-it-works) |
 
 The repository provides:
 
