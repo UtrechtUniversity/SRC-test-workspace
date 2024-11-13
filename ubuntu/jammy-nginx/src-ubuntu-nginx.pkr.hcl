@@ -107,7 +107,7 @@ build {
       "--skip-tags",
       "molecule-notest,molecule-idempotence-notest",
       "--extra-vars",
-      "rsc_nginx_authorization_endpoint=localhost rsc_nginx_user_info_endpoint=http://localhost rsc_nginx_service_url=http://localhost",
+      "rsc_nginx_authorization_endpoint=localhost/auth_endpoint rsc_nginx_user_info_endpoint=http://localhost/user_endpoint rsc_nginx_service_url=http://localhost/service",
       "--extra-vars",
       "{nginx_enable_ssl: False, nginx_enable_auth: True}",
       "--extra-vars",
