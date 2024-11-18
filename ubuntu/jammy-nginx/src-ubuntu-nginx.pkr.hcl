@@ -116,7 +116,7 @@ build {
   }
 
   provisioner "file" {
-    sources = "run_component.sh"
+    source = "run_component.sh"
     destination = "/usr/local/bin/run_component.sh"
   }
 
