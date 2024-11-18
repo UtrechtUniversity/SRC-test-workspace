@@ -139,6 +139,11 @@ On top of the base Linux image, Packer will execute a number of shell scripts, a
 
 The repositories for these components are included in this repo as git submodules.
 
+Additionally:
+
+1. The SRC-External plugin is copied to the container so it is available for testing. Its location is `/etc/rsc/plugin-external-plugin`.
+2. The `run_component.sh` script is copied to the container (`/usr/local/bin`) to facilitate testing.
+
 ### SRC-OS
 
 Installs basic packages and services, sets permissions, etc.

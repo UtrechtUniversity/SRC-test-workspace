@@ -226,6 +226,16 @@ build {
     inline_shebang = "/bin/sh -ex"
   }
 
+  provisioner "file" {
+    source      = "run_component.sh"
+    destination = "/usr/local/bin/run_component.sh"
+  }
+
+  provisioner "file" {
+    source      = "plugin-external-plugin"
+    destination = "/etc/rsc/plugin-external-plugin"
+  }
+
   post-processor "docker-tag" {
     only       = ["docker.ubuntu"]
     repository = "${var.container_repo}${var.img_tag_suffix}"

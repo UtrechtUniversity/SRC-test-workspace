@@ -115,6 +115,16 @@ build {
     ])
   }
 
+  provisioner "file" {
+    sources = "run_component.sh"
+    destination = "/usr/local/bin/run_component.sh"
+  }
+
+  provisioner "file" {
+    source = "plugin-external-plugin"
+    destination = "/etc/rsc/plugin-external-plugin"
+  }
+
   # The autoremove command run below removes recommended and suggested packages installed by 'apt installs' executed by the components executed above.
   # This makes for a smaller image (~260MB), but it may result in errors if further components implicitly rely on those recommended packages.
   provisioner "shell" {
