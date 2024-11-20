@@ -26,6 +26,7 @@ if [[ -e "$REQUIREMENTS" ]]; then
     echo "Found $REQUIREMENTS..."
     echo "Installing $REQUIREMENTS using ansible-galaxy"
     ansible-galaxy collection install -r "$REQUIREMENTS"
+    ansible-galaxy role install -r "$REQUIREMENTS"
 else
     echo "Did not find a requirements file in $REQUIREMENTS!"
 fi
