@@ -216,6 +216,7 @@ build {
   # This makes for a smaller image (~260MB), but it may result in errors if further components implicitly rely on those recommended packages.
   provisioner "shell" {
     inline = [
+      "systemctl disable cron", # ensure cron is disabled when starting a container with /sbin/init
       "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}",
       "mkdir -p /etc/rsc/ && echo ${var.testuser.username} > /etc/rsc/managedgroups && touch /etc/rsc/managedusers/${var.testuser.username}",
       "mkdir -p /var/tmp",
