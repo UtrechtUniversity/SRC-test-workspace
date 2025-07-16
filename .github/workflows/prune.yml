@@ -52,5 +52,5 @@ jobs:
         env:
           OWNER: orgs/UtrechtUniversity
           PACKAGE_NAME: SRC-test-workspace
-          KEEP_MIN: 10
+          KEEP_MIN: 0
           PER_PAGE: 100
