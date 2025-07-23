@@ -20,7 +20,7 @@ fi
 
 if [ -z "$IMG" ]
 then
-  IMG="ubuntu/focal"
+  IMG="ubuntu/jammy"
 fi
 OS_NAME=$(echo "$IMG" | cut -f1 -d/)
 OS_VERSION=$(basename "$IMG")
