@@ -182,7 +182,7 @@ build {
   sources = var.enabled_sources
 
   provisioner "shell" {
-    pause_before = "5s", # pause so that the container 'init' command has time to finish completely
+    pause_before = "5s" # pause so that the container 'init' command has time to finish completely
     only   = ["docker.ubuntu", "podman.ubuntu"]
     inline = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"]
   }
