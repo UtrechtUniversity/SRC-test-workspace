@@ -4,12 +4,12 @@ This repository provides a set of scripts and [Packer](https://www.packer.io/) i
 
 | Image name | Tag | Description |
 | -- | -- | -- |
-| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal | Ubuntu 20.04 |
-| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal_desktop | Ubuntu 20.04 with xfce4 |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_noble | Ubuntu 24.04 |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_noble_desktop | Ubuntu 24.04 with xfce4 |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy | Ubuntu 22.04 |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy_desktop | Ubuntu 22.04 with xfce4 |
-| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-pilot | Ubuntu 20.04, latest version of [base components](#how-it-works). |
-| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_focal-desktop-pilot | Ubuntu 20.04 with xfce4, latest version of [base components](#how-it-works) |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_noble-pilot | Ubuntu 24.04, latest version of [base components](#how-it-works). |
+| ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_noble-desktop-pilot | Ubuntu 24.04 with xfce4, latest version of [base components](#how-it-works) |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-pilot | Ubuntu 22.04, latest version of [base components](#how-it-works) |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-desktop-pilot | Ubuntu 22.04 with xfce4, latest version of [base components](#how-it-works) |
 | ghcr.io/utrechtuniversity/src-test-workspace | ubuntu_jammy-nginx | Ubuntu 22.04 with [Nginx component](https://github.com/utrechtuniversity/src-component-nginx) |
@@ -35,7 +35,7 @@ Run `ansible-galaxy collection install -r requirements.yml` to install the requi
 
 ## Usage
 
-To create the default `ubuntu/focal` image:
+To create the default `ubuntu/noble` image:
 
 `./pack.sh [docker,podman,vagrant]`
 
@@ -103,7 +103,7 @@ For example, for the Ubuntu templates:
 
 ```
 ubuntu
-├── focal
+├── noble
 │   ├── src-ubuntu.pkr.hcl -> ../src-ubuntu.pkr.hcl
 │   └── variables.auto.pkrvars.hcl
 ├──cfo-al_desktop
@@ -179,7 +179,7 @@ Docker does not allow modifying `/etc/hosts` or `/etc/hostname`. The SRC-OS comp
 
 # CI
 
-The CI `build_and_deploy` workflow will run the `pack.sh` script on each template directory (`<os>/<version>`) that was changed in the pushed commit. It also detects if a symlinked template file is changed, and then run `pack.sh` on each template that relies on it. So for instance, if `ubuntu/src-ubuntu.pkr.hcl` is changed, the build is run for all the subdirectories of `ubuntu`: `ubuntu/focal`, `ubuntu/jammy`, `ubuntu_focal-desktop`.
+The CI `build_and_deploy` workflow will run the `pack.sh` script on each template directory (`<os>/<version>`) that was changed in the pushed commit. It also detects if a symlinked template file is changed, and then run `pack.sh` on each template that relies on it. So for instance, if `ubuntu/src-ubuntu.pkr.hcl` is changed, the build is run for all the subdirectories of `ubuntu`: `ubuntu/noble`, `ubuntu/jammy`, `ubuntu_noble-desktop`.
 
 The `build_and_deploy` workflow checks out the latest version of all the submodules, so the image builds are always based on the latest version of them.
 
