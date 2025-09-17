@@ -1,3 +1,3 @@
 FROM docker.io/ubuntu:noble
-RUN apt update -y && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends systemd sudo
+RUN apt update -y && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends systemd sudo util-linux-extra
 RUN ln -s /lib/systemd/systemd /sbin/init
