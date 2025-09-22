@@ -27,7 +27,6 @@ jobs:
           - ubuntu/jammy
           - ubuntu/jammy-desktop
           - ubuntu/noble
-          - ubuntu/noble-desktop
     steps:
       - name: Checkout
         uses: actions/checkout@v5
