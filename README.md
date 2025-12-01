@@ -51,6 +51,10 @@ To select a different image, use the `IMG` environment variable:
 
 Valid values for `IMG` are paths to directories containing the Packer templates, of the form `<os>/<version>` (for example, `ubuntu/jammy`).
 
+### Debug
+
+You can use the `ON_BUILD_FAILURE` env variable to determine what `packer` should do if a build fails. See the possible options for `packer build`'s `-on-error=`option. By default, this is set to `cleanup`, but you can specify `abort` to keep the (failed) container alive for inspection.
+
 ### Base container images
 
 Container images are built on top of the base images defined in the `base` directory. The Containerfiles in the subdirectories of that directory 

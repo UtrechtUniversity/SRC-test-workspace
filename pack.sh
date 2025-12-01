@@ -8,6 +8,11 @@ then
   exit 1
 fi
 
+if [ -z "$ON_BUILD_FAILURE" ]
+then
+  ON_BUILD_FAILURE="cleanup"
+fi
+
 if [ -z "$UPDATE_BASE_COMPONENTS" ]
 then
   UPDATE_BASE_COMPONENTS=false
@@ -80,6 +85,6 @@ then
   IMG_TAG_SUFFIX="-var img_tag_suffix=-pilot"
 fi
 
-CMD="packer init $IMG && packer fmt $IMG && packer build -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG_TAG_SUFFIX $IMG"
+CMD="packer init $IMG && packer fmt $IMG && packer build -on-error="$ON_BUILD_FAILURE" -var 'enabled_sources=[$joined_targets]' -var 'target_arch=$ARCH' $IMG_TAG_SUFFIX $IMG"
 echo "Running: $CMD"
 eval "$CMD";
