@@ -23,10 +23,13 @@ jobs:
         update_base_components:
           - true
           - false
-        images:
+        image:
           - ubuntu/jammy
           - ubuntu/jammy-desktop
           - ubuntu/noble
+        exclude:
+          - update_base_components: false
+            image: ubuntu/noble
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -46,10 +49,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         id: build-image
-        run: IMG=${{ matrix.images }} UPDATE_BASE_COMPONENTS=${{ matrix.update_base_components }} ./pack.sh docker
+        run: IMG=${{ matrix.image }} UPDATE_BASE_COMPONENTS=${{ matrix.update_base_components }} ./pack.sh docker
       - name: Get image name and tag # grep in the image directory's variables file to find the image name/tag to push to
         id: get-image-name
         run: |
-          echo "container_repo=`grep container_repo ${{ matrix.images }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
+          echo "container_repo=`grep container_repo ${{ matrix.image }}/variables.auto.pkrvars.hcl | awk '{print $3}'`"  >> "$GITHUB_OUTPUT"
       - name: Push image
         run: docker push ${{ steps.get-image-name.outputs.container_repo }}${{ matrix.update_base_components && '-pilot' || '' }}
