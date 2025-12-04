@@ -1,6 +1,10 @@
 ---
 name: Prune Untagged Images
 on:
+  workflow_run:
+    workflows: ["Build and Deploy complex Ubuntu images"]
+    types:
+      - completed
   schedule:
     - cron: '22 1 * * *' # 22 past 1am daily
   workflow_dispatch:
