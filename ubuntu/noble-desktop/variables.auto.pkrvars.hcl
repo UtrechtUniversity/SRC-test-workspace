@@ -1,5 +1,5 @@
-container_repo               = "ghcr.io/utrechtuniversity/src-test-workspace:ubuntu_jammy-desktop"
-img_tag                   = "ubuntu_jammy-desktop"
+container_repo               = "ghcr.io/utrechtuniversity/src-test-workspace:ubuntu_noble-desktop"
+img_tag                   = "ubuntu_noble-desktop"
 container_base_img        = "src-base-ubuntu_noble-desktop:latest"
 vagrant_base_img          = "ubuntu/jammy64"
 extra_packages            = "gdm3 xfce4 xrdp xauth xorgxrdp"
