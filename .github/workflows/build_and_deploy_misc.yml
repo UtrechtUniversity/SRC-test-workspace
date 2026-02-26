@@ -29,7 +29,6 @@ jobs:
           - true
           - false
         image:
-          - ubuntu/jammy-nginx
           - ubuntu/noble-nginx
         exclude:
           - update_base_components: false
