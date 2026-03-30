@@ -38,9 +38,9 @@ else
 fi
 echo "Building image for architecture: $ARCH"
 
-PODMAN_SRC="\"sources.podman.ubuntu\""
-DOCKER_SRC="\"sources.docker.ubuntu\""
-VAGRANT_SRC="\"sources.vagrant.ubuntu\""
+PODMAN_SRC="\"sources.podman.$OS_NAME\""
+DOCKER_SRC="\"sources.docker.$OS_NAME\""
+VAGRANT_SRC="\"sources.vagrant.$OS_NAME\""
 TARGETS=()
 
 build_base_img() {
