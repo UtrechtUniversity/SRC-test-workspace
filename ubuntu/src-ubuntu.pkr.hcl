@@ -33,6 +33,11 @@ variable "workspace_ansible_version" {
   type    = string
 }
 
+variable "workspace_ansible_venv" {
+  default = "/etc/src/venv/ansible_env" # path to venv containing ansible that should be created on the workspace
+  type    = string
+}
+
 variable "common_ansible_args" {
   default = [
     "-b",
@@ -224,6 +229,8 @@ build {
       "mkdir -p /var/tmp",
       "apt-get autoremove -y -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*",
       "mkdir -p /usr/share/man/man1", # The step above removed all the man pages content, but this directory needs to be present as an install target for subsequent apt installs by components.
+      "VIRTUAL_ENV=${var.workspace_ansible_venv} uv pip install -n ansible==${var.workspace_ansible_version}", # the SRC-External plugin deletes the created venv at the end of component execution, we want it to be present on the workspace for efficiency in CI.
+      "uv cache clean",
       var.extra_post_commands
     ]
     inline_shebang = "/bin/sh -ex"
