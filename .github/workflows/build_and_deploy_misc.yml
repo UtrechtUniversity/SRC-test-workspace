@@ -30,9 +30,6 @@ jobs:
           - false
         image:
           - ubuntu/noble-nginx
-        exclude:
-          - update_base_components: false
-            image: ubuntu/noble-nginx
     steps:
       - name: Checkout
         uses: actions/checkout@v6
