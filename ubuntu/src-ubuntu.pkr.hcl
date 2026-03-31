@@ -90,7 +90,6 @@ variable "testuser" {
   default = {
     username = "testuser"
     password = "letmein"
-    uid = "1001"
   }
 }
 
@@ -225,7 +224,7 @@ build {
   provisioner "shell" {
     inline = [
       "systemctl disable cron", # ensure cron is disabled when starting a container with /sbin/init
-      "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) -u ${var.testuser.uid} ${var.testuser.username}",
+      "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}",
       "mkdir -p /etc/rsc/ && echo ${var.testuser.username} > /etc/rsc/managedgroups && touch /etc/rsc/managedusers/${var.testuser.username}",
       "mkdir -p /var/tmp",
       "apt-get autoremove -y -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*",
