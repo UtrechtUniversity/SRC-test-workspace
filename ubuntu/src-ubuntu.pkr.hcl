@@ -190,7 +190,7 @@ build {
   provisioner "shell" {
     pause_before = "5s" # pause so that the container 'init' command has time to finish completely
     inline       = [
-     "apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"
+     "apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}",
      "cp /etc/login.defs /etc/login.defs.orig" # workaround: CO extension defines max/min UIDs outside of range accepted by GitHub actions, so backup the original so we can restore it below.
     ]
   }
