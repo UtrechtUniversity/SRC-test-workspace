@@ -90,7 +90,6 @@ variable "testuser" {
   default = {
     username = "testuser"
     password = "letmein"
-    uid = "165537"
   }
 }
 
@@ -190,8 +189,10 @@ build {
 
   provisioner "shell" {
     pause_before = "5s" # pause so that the container 'init' command has time to finish completely
-    only         = ["docker.ubuntu", "podman.ubuntu"]
-    inline       = ["apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"]
+    inline       = [
+     "apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends -y ${var.base_packages} ${var.extra_packages}"
+     "cp /etc/login.defs /etc/login.defs.orig" # workaround: CO extension defines max/min UIDs outside of range accepted by GitHub actions, so backup the original so we can restore it below.
+    ]
   }
 
   provisioner "ansible" {
@@ -225,7 +226,8 @@ build {
   provisioner "shell" {
     inline = [
       "systemctl disable cron", # ensure cron is disabled when starting a container with /sbin/init
-      "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) -u ${var.testuser.uid} -U ${var.testuser.username}",
+      "rm /etc/login.defs && mv /etc/login.defs.orig /etc/login.defs", # workaround: CO extension defines max/min UIDs outside of range accepted by GitHub actions, so reset the original.
+      "useradd -m -s $(which bash) -p $(openssl passwd -1  ${var.testuser.password}) ${var.testuser.username}",
       "mkdir -p /etc/rsc/ && echo ${var.testuser.username} > /etc/rsc/managedgroups && touch /etc/rsc/managedusers/${var.testuser.username}",
       "mkdir -p /var/tmp",
       "apt-get autoremove -y -o APT::Autoremove::RecommendsImportant=0 -o APT::Autoremove::SuggestsImportant=0 && apt-get autoclean -y && apt-get clean -y", "rm -rf /tmp/* /var/tmp* /usr/share/doc/* /root/.ansible* /usr/share/man/* /root/.cache /etc/rsc/plugins/*",
