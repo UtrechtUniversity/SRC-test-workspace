@@ -27,6 +27,12 @@ jobs:
           - ubuntu/jammy
           - ubuntu/jammy-desktop
           - ubuntu/noble
+          - ubuntu/noble-desktop
+        exclude:
+          - image: ubuntu/jammy-desktop
+            update_base_components: true
+          - image: ubuntu/noble-desktop
+            update_base_components: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6
