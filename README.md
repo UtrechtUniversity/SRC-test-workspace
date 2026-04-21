@@ -183,8 +183,10 @@ Docker does not allow modifying `/etc/hosts` or `/etc/hostname`. The SRC-OS comp
 
 # CI
 
-The CI `build_and_deploy` workflow will run the `pack.sh` script on each template directory (`<os>/<version>`) that was changed in the pushed commit. It also detects if a symlinked template file is changed, and then run `pack.sh` on each template that relies on it. So for instance, if `ubuntu/src-ubuntu.pkr.hcl` is changed, the build is run for all the subdirectories of `ubuntu`: `ubuntu/noble`, `ubuntu/jammy`, `ubuntu_noble-desktop`.
+The CI `build_and_deploy_<os>` (e.g.: `build_and_deploy_ubuntu`) workflow will run the `pack.sh` script on each template directory (`<os>/<version>`) that was changed in the pushed commit. It also detects if a symlinked template file is changed, and then run `pack.sh` on each template that relies on it. So for instance, if `ubuntu/src-ubuntu.pkr.hcl` is changed, the build is run for all the subdirectories of `ubuntu`: `ubuntu/noble`, `ubuntu/jammy`, `ubuntu_noble-desktop`.
 
 The `build_and_deploy` workflow checks out the latest version of all the submodules, so the image builds are always based on the latest version of them.
 
 The `prune` workflow runs once a day (or when manually triggered), and will remove all untagged image versions except for the newest three. This ensures that when a new version of an image is built (and receives its tags), older versions are removed -- but we always keep some old versions of the images.
+
+The `build_and_deploy_misc` workflow will build images that are *based on* the base images created by `build_and_deploy_<os>`. First instance, it generates an image with the [SURF Nginx component](https://gitlab.com/rsc-surf-nl/plugins/plugin-nginx) already installed on top of a normal workspace image.
