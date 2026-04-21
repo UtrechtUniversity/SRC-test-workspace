@@ -30,6 +30,7 @@ jobs:
           - false
         image:
           - ubuntu/noble-nginx
+          - ubuntu/jammy-nginx
     steps:
       - name: Checkout
         uses: actions/checkout@v6
