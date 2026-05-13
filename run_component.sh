@@ -12,6 +12,8 @@ EOF
 
 set -euo pipefail
 
+source /etc/src/venv/src-venv/bin/activate # default venv that contains ansible tools.
+
 if [[ "$#" -lt 1 || "$#" -gt 1 ]]; then
     echo "$USAGE"
     exit 1
