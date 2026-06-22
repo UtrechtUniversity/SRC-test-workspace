@@ -35,7 +35,7 @@ jobs:
             update_base_components: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Install specific ansible-core version
