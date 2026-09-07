@@ -40,7 +40,7 @@ else
     EXTRA_VARS=""
 fi
 
-export ANSIBLE_STDOUT_CALLBACK="yaml"
+export ANSIBLE_RESULT_CALLBACK="yaml"
 export ANSIBLE_FORCE_COLOR="True"
 
 CMD="ansible-playbook -i localhost, -c local -vv $EXTRA_VARS $PLAYBOOK"
