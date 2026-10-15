@@ -15,7 +15,7 @@ EOF
 
 set -euo pipefail
 
-#source /etc/src/venv/src-venv/bin/activate # default venv that contains ansible tools.
+source /etc/src/venv/src-venv/bin/activate # default venv that contains ansible tools.
 
 if [[ -n "$1" && "$1" == "--help" ]]; then
     echo "$USAGE"
